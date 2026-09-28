@@ -19,7 +19,7 @@ const EvidenceChips = ({
   point: DataPoint
   onSelectEvidence: (evidenceId: string) => void
 }) => (
-  <span className="flex flex-wrap justify-center gap-1">
+  <span className="flex shrink-0 flex-wrap justify-center gap-1">
     {point.evidenceIds.map((evidenceId) => (
       <button
         key={evidenceId}
@@ -183,16 +183,24 @@ const FunnelSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, ac
               <span className="ds-caption w-[78px] shrink-0 text-left text-[10px] leading-tight text-ink">
                 {point.label}
               </span>
-              <span
-                className="h-6 shrink-0 rounded-pill transition-opacity duration-200"
-                style={{
-                  width: `${(point.value / max) * 100}%`,
-                  backgroundImage: PILL_GRADIENT,
-                  opacity: onPath ? 1 : OFF_PATH_OPACITY,
-                  outline: isActive ? '1px solid var(--color-ink)' : undefined,
-                  outlineOffset: '1px',
-                }}
-              />
+              {/* The bar's percentage has to resolve against the space left
+                  over by the label and the value, not the whole row. A
+                  `width: 100%` on the bar itself asked for the full row width
+                  *plus* those two fixed columns, so the bar and the value were
+                  pushed out through the card's edge. The track absorbs the
+                  free space and the fill is measured against the track. */}
+              <span className="min-w-0 flex-1">
+                <span
+                  className="block h-6 rounded-pill transition-opacity duration-200"
+                  style={{
+                    width: `${(point.value / max) * 100}%`,
+                    backgroundImage: PILL_GRADIENT,
+                    opacity: onPath ? 1 : OFF_PATH_OPACITY,
+                    outline: isActive ? '1px solid var(--color-ink)' : undefined,
+                    outlineOffset: '1px',
+                  }}
+                />
+              </span>
               <span className="ds-caption w-[56px] shrink-0 text-[10px]">
                 {formatValue(point.value)} {series.unit}
               </span>

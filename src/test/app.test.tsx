@@ -127,6 +127,30 @@ describe('cases load', () => {
     expect(screen.getByTestId('source-mark-E1')).toHaveAttribute('data-active', 'true')
   })
 
+  it('measures funnel bars against a track so they stay inside the card', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await selectCase(user, 'product-adoption')
+    await user.click(screen.getByRole('tab', { name: 'Data View' }))
+
+    // A `width: 100%` on the bar itself resolved against the whole button
+    // row rather than the space left by the label and the value, so the bar
+    // and its value were pushed out through the card's edge. The bar must sit
+    // inside a flexible track and be measured against that.
+    const bars = [...screen.getByTestId('data-view').querySelectorAll<HTMLElement>('ul li button > span > span')]
+    expect(bars.length).toBeGreaterThan(0)
+    for (const bar of bars) {
+      const track = bar.parentElement!
+      expect(track).toHaveClass('flex-1')
+      expect(track.children).toHaveLength(1)
+      expect(bar.style.width).toMatch(/^\d+(\.\d+)?%$/)
+    }
+    // Every fill stays within the width of its own track, so a 100% bar can
+    // never exceed it.
+    for (const bar of bars) {
+      expect(parseFloat(bar.style.width)).toBeLessThanOrEqual(100)
+    }
+  })
   it('stretches the trend line across the full plot width', async () => {
     const user = userEvent.setup()
     render(<App />)
