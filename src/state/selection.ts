@@ -18,10 +18,14 @@ export type Action =
   | { type: 'set-tab'; tab: WorkspaceTab }
   | { type: 'clear' }
 
+const defaultCase = getCaseById(DEFAULT_CASE_ID)
+
+// The app must open on a coherent selection, exactly as switching cases does.
+// Starting on nulls left every path empty, so the Data View opened with no
+// point on the path and the whole first screen read as unstyled.
 export const initialState: SelectionState = {
   selectedCaseId: DEFAULT_CASE_ID,
-  selectedClaimId: null,
-  selectedEvidenceId: null,
+  ...defaultSelectionFor(defaultCase),
   activeWorkspaceTab: 'graph',
 }
 

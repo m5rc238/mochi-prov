@@ -112,6 +112,34 @@ describe('cases load', () => {
     expect(screen.getByTestId('answer-text')).toHaveTextContent(answer)
     expect(selectedCaseTitle()).toContain(CASE_LABELS[id])
   })
+
+  /* A case must open on a coherent selection, the same way it does after a case
+     switch. Opening on nulls left every path empty, so the Data View rendered
+     with no point on the path and the first screen looked unstyled. */
+  it('opens on a selected claim and evidence rather than a blank pane', () => {
+    render(<App />)
+
+    expect(screen.getByTestId('claim-C1')).toHaveAttribute('data-selected', 'true')
+    // The graph marks the focus node — the selected evidence — not the claim.
+    expect(graphNode('evidence:E1')?.querySelector('[data-entity-id="E1"]')).toHaveAttribute('data-selected', 'true')
+    expect(graphNode('claim:C1')?.querySelector('[data-entity-id="C1"]')).toHaveAttribute('data-emphasized', 'true')
+    expect(screen.getByTestId('graph-hint')).toHaveTextContent('E1')
+    expect(screen.getByTestId('source-mark-E1')).toHaveAttribute('data-active', 'true')
+  })
+
+  it('renders every Data View bar with the brand gradient, on path or not', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('tab', { name: 'Data View' }))
+
+    const bars = [...screen.getByTestId('data-view').querySelectorAll('span[style*="background-image"]')]
+    expect(bars.length).toBeGreaterThan(0)
+    // An off-path bar is recessive, never a flat grey: the chart should still
+    // read as a chart when it belongs to the unselected claim.
+    for (const bar of bars) {
+      expect((bar as HTMLElement).style.backgroundImage).toContain('gradient')
+    }
+  })
 })
 
 describe('every pane follows the selected case', () => {

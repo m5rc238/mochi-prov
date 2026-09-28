@@ -4,7 +4,11 @@ import { useEvidenceSelection } from '../hooks/useEvidenceSelection'
 import type { DataPoint, DataSeries } from '../model/types'
 
 const PILL_GRADIENT = 'linear-gradient(90deg, #F9E79F 0%, #B8C0FF 60%, #D6E4FF 100%)'
-const MUTED_FILL = 'color-mix(in srgb, var(--color-rule) 34%, transparent)'
+
+/* Off-path bars keep the brand gradient at a lower opacity instead of being
+   swapped for a flat grey. A series backed by the unselected claim should
+   still read as a chart, not as something that failed to render. */
+const OFF_PATH_OPACITY = 0.45
 
 const formatValue = (value: number) => (Number.isInteger(value) ? String(value) : value.toFixed(1))
 
@@ -76,7 +80,12 @@ const VerticalSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, 
               <span
                 aria-hidden="true"
                 className="ds-caption absolute inset-x-0 text-center text-[10px] leading-none"
-                style={{ top: Math.max(1, top - 13), color: 'var(--color-ink)' }}
+                style={{
+                  // Sit above the bar, or inside its top when the bar reaches
+                  // the ceiling and there is no headroom left.
+                  top: top < 13 ? top + 3 : top - 13,
+                  color: 'var(--color-ink)',
+                }}
               >
                 {formatValue(point.value)}
               </span>
@@ -89,16 +98,15 @@ const VerticalSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, 
                 data-on-path={onPath}
                 data-active={isActive}
                 className={[
-                  'absolute inset-0 flex flex-col justify-end rounded-chip p-0.5 transition-opacity duration-200',
-                  onPath ? 'opacity-100' : 'opacity-45 hover:opacity-80',
+                  'absolute inset-0 flex flex-col justify-end rounded-chip p-0.5',
                 ].join(' ')}
               >
                 <span
                   className="mx-auto w-[58%] rounded-t-[2px] transition-opacity duration-200"
                   style={{
                     height: barHeight,
-                    backgroundImage: onPath ? PILL_GRADIENT : undefined,
-                    backgroundColor: onPath ? undefined : MUTED_FILL,
+                    backgroundImage: PILL_GRADIENT,
+                    opacity: onPath ? 1 : OFF_PATH_OPACITY,
                     outline: isActive ? '1px solid var(--color-ink)' : undefined,
                     outlineOffset: '1px',
                   }}
@@ -108,7 +116,7 @@ const VerticalSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, 
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute left-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{ top: valueY, background: onPath ? 'var(--color-ink)' : 'var(--color-rule)' }}
+                  style={{ top: valueY, background: 'var(--color-ink)', opacity: onPath ? 1 : OFF_PATH_OPACITY }}
                 />
               ) : null}
             </div>
@@ -154,8 +162,7 @@ const FunnelSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, ac
           <li
             key={point.id}
             className={[
-              'flex items-center gap-3 rounded-chip p-1 transition-opacity duration-200',
-              onPath ? 'opacity-100' : 'opacity-45 hover:opacity-80',
+              'flex items-center gap-3 rounded-chip p-1',
               isActive ? 'bg-sunken' : '',
             ].join(' ')}
           >
@@ -176,8 +183,8 @@ const FunnelSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, ac
                 className="h-6 shrink-0 rounded-pill transition-opacity duration-200"
                 style={{
                   width: `${(point.value / max) * 100}%`,
-                  backgroundImage: onPath ? PILL_GRADIENT : undefined,
-                  backgroundColor: onPath ? undefined : MUTED_FILL,
+                  backgroundImage: PILL_GRADIENT,
+                  opacity: onPath ? 1 : OFF_PATH_OPACITY,
                   outline: isActive ? '1px solid var(--color-ink)' : undefined,
                   outlineOffset: '1px',
                 }}

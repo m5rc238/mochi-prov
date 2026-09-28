@@ -124,6 +124,11 @@ Roles, mapped onto the three families in section 1:
 * **On path:** mint wash plus a left accent bar. Applies to every entity in the
   current claim-to-source path, in the graph, the claim list, the Data View and
   the source at once.
+* **Off path, in the Data View:** the same brand gradient at 45% opacity. An
+  off-path bar must never become a flat grey — a series belonging to the
+  unselected claim still has to read as a chart rather than as something that
+  failed to render. Emphasis is carried by the fill's opacity alone; the value
+  labels always stay at full strength so the numbers are readable either way.
 * **Selected:** ink hairline at full opacity plus the accent bar — the only
   state allowed to darken a border.
 * **Active (in source):** the mint wash animates from opaque to 45% over 900ms,
