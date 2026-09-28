@@ -81,6 +81,11 @@
   `24` between major blocks.
 * **Panel padding is 16px**; the space between panes is 12px; the app gutter is
   12px. Nothing in the system uses a gap that is not a multiple of 4.
+* **A section heading sits 4px above the content it labels** (`.ds-section-heading`).
+  A 10px uppercase mono label flush against 21–23px serif copy reads as one
+  crowded block rather than as a label introducing content. Applied to
+  Question, Answer and Claims. A label that *follows* content keeps its own
+  spacing instead — the `Evidence` row inside a claim card stays at 8px.
 
 ### 3.4 Borders, radii, elevation
 * **No shadows anywhere.** Separation is carried by hairline rules and surface

@@ -5,7 +5,7 @@ export const AnswerPanel = () => {
 
   return (
     <section aria-labelledby="answer-heading" data-testid="answer-panel">
-      <h2 id="answer-heading" className="ds-label">
+      <h2 id="answer-heading" className="ds-label ds-section-heading">
         Answer
       </h2>
       <p

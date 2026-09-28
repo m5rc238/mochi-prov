@@ -127,6 +127,18 @@ describe('cases load', () => {
     expect(screen.getByTestId('source-mark-E1')).toHaveAttribute('data-active', 'true')
   })
 
+  it('separates each section heading from the content it labels', () => {
+    render(<App />)
+
+    // The 10px mono label and the 21-23px serif copy below it read as one
+    // crowded block without the 4px. The rule lives in a class, so pin the
+    // class rather than a computed margin: jsdom loads no stylesheet here.
+    for (const id of ['question-heading', 'answer-heading', 'claims-heading']) {
+      expect(screen.getByRole('heading', { name: new RegExp(id === 'claims-heading' ? 'Claims' : id.replace('-heading', ''), 'i') }))
+        .toHaveClass('ds-section-heading')
+    }
+  })
+
   it('measures funnel bars against a track so they stay inside the card', async () => {
     const user = userEvent.setup()
     render(<App />)

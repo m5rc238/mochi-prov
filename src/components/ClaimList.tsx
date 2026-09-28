@@ -7,7 +7,7 @@ export const ClaimList = () => {
 
   return (
     <section aria-labelledby="claims-heading" data-testid="claim-list">
-      <h2 id="claims-heading" className="ds-label">
+      <h2 id="claims-heading" className="ds-label ds-section-heading">
         Claims · {demoCase.claims.length}
       </h2>
 

@@ -72,6 +72,13 @@
     color: var(--color-ink-muted);
   }
 
+  /* --- Section heading: a label that introduces a block of content. The
+     4px separates the 10px mono label from the 21-23px serif copy below it;
+     flush against it, the two read as one crowded block. ------------------------ */
+  .ds-section-heading {
+    margin-bottom: 4px;
+  }
+
   /* --- Panel: hairline-ruled surface. No shadows anywhere in this system. - */
   .ds-panel {
     background-color: var(--color-surface);
