@@ -127,6 +127,21 @@ describe('cases load', () => {
     expect(screen.getByTestId('source-mark-E1')).toHaveAttribute('data-active', 'true')
   })
 
+  it('stretches the trend line across the full plot width', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('tab', { name: 'Data View' }))
+
+    const svg = screen.getByTestId('data-view').querySelector('svg[viewBox]') as SVGSVGElement
+    expect(svg).not.toBeNull()
+    // jsdom has no layout engine, so the rendered width cannot be measured
+    // here. The width must stay explicit: with only a height set, the square
+    // viewBox aspect ratio sizes the SVG to height x height and `inset-x-0`
+    // will not stretch it, which crushes the line into the left of the plot.
+    expect(svg.style.width).toBe('100%')
+    expect(svg.getAttribute('preserveAspectRatio')).toBe('none')
+  })
+
   it('renders every Data View bar with the brand gradient, on path or not', async () => {
     const user = userEvent.setup()
     render(<App />)

@@ -132,7 +132,11 @@ const VerticalSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, 
         <svg
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0"
-          style={{ height: PLOT_H }}
+          /* The width must be explicit. With only a height set, the square
+             viewBox aspect ratio sizes the SVG to height x height, and
+             `inset-x-0` does not stretch it — which squashed the whole
+             0-100 x-range into the left edge of the plot. */
+          style={{ width: '100%', height: PLOT_H }}
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
         >
