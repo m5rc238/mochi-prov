@@ -4,6 +4,11 @@
 
 Built. Running at `/prototypes/proto-01/app/`.
 
+This is version 1 of the record, and it describes the built prototype. The study protocol designed
+against it is [version 2](/prototypes/proto-01/doc-v2.html). The two are kept separately: version 1
+says what was built, version 2 says what will be measured, and a record that is overwritten is a
+record whose history can no longer be read.
+
 ## Research question
 
 Does making the relationship between an answer's claims and their supporting evidence explicit
@@ -172,6 +177,8 @@ design. The rule it follows is **measure before changing anything**: baseline fi
 compare third.
 
 ## Changelog
+
+Version 1. See [version 2](/prototypes/proto-01/doc-v2.html) for the study protocol.
 
 - Three-pane provenance explorer built, with shared selection across Question, Data View, and Source.
 - Provenance graph view added, with a zoom floor at 0.72 so node copy stays legible.

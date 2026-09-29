@@ -17,5 +17,9 @@ export const SITE_PAGES: Record<string, string> = {
   evidenceModel: '/shared/evidence-model.html',
   proto01App: '/prototypes/proto-01/app/index.html',
   proto01Doc: '/prototypes/proto-01/doc.html',
+  /** The second version of Proto 01's record: the study protocol. A separate
+   * page rather than a revision of the first, because a research record that is
+   * overwritten is a record whose history can no longer be read. */
+  proto01DocV2: '/prototypes/proto-01/doc-v2.html',
   proto02Doc: '/prototypes/proto-02/doc.html',
 }

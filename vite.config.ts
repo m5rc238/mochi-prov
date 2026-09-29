@@ -11,8 +11,9 @@ const here = fileURLToPath(new URL('.', import.meta.url))
 const fromRoot = (...parts: string[]) => resolve(here, ...parts)
 
 // The site is a small set of static pages: the research catalog, one
-// documentation page per prototype, the shared evidence model, and the Proto 01
-// app itself. They are separate documents rather than client-side routes.
+// documentation page per prototype (plus Proto 01's second record version),
+// the shared evidence model, and the Proto 01 app itself. They are separate
+// documents rather than client-side routes.
 //
 // The list lives in `shared/pages.ts` so the tests can check it; it is resolved
 // to absolute paths here because that is what Rollup wants.

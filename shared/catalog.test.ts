@@ -4,11 +4,17 @@ import { PROTOTYPES, RESEARCH } from './catalog'
 import { renderMarkdown } from './markdown'
 import { SITE_PAGES } from './pages'
 import proto01Doc from '../prototypes/proto-01/doc.md?raw'
+import proto01DocV2 from '../prototypes/proto-01/doc-v2.md?raw'
 import proto02Doc from '../prototypes/proto-02/doc.md?raw'
 
-/** The research records, keyed by prototype id, read straight off disk. */
+/** The research records, keyed by prototype id, read straight off disk.
+ *
+ * `proto-01-v2` is a second *version* of Proto 01's record, not a second
+ * prototype: it is keyed separately so the prototype-keyed assertions below
+ * stay about the prototype, and so the record set can be iterated on its own. */
 const DOCS: Record<string, string> = {
   'proto-01': proto01Doc,
+  'proto-01-v2': proto01DocV2,
   'proto-02': proto02Doc,
 }
 
@@ -30,8 +36,8 @@ const globs = [
   import.meta.glob('../shared/*.md', { eager: true, query: '?raw', import: 'default' }),
   import.meta.glob('../experiments/*.html', { eager: true, query: '?raw', import: 'default' }),
   import.meta.glob('../prototypes/*.html', { eager: true, query: '?raw', import: 'default' }),
-  import.meta.glob('../prototypes/*/doc.md', { eager: true, query: '?raw', import: 'default' }),
-  import.meta.glob('../prototypes/*/doc.html', { eager: true, query: '?raw', import: 'default' }),
+  import.meta.glob('../prototypes/*/doc*.md', { eager: true, query: '?raw', import: 'default' }),
+  import.meta.glob('../prototypes/*/doc*.html', { eager: true, query: '?raw', import: 'default' }),
   import.meta.glob('../prototypes/*/app/index.html', { eager: true, query: '?raw', import: 'default' }),
 ]
 
@@ -72,6 +78,9 @@ const published = new Set([
   // which the build does not emit and a reader is never sent to.
   ...PROTOTYPES.map((p) => p.docPagePath),
   ...PROTOTYPES.filter((p) => p.appPath).map((p) => p.appPath!),
+  // A record version is a page, not a prototype, so it is read from the one
+  // place pages are declared rather than listed here a second time.
+  SITE_PAGES.proto01DocV2,
 ])
 
 const isPublished = (href: string): boolean => published.has(href)
@@ -100,6 +109,14 @@ describe('site build', () => {
       expect(exists(doc), `${doc} should exist`).toBe(true)
     }
     expect(published.has('/shared/evidence-model.html')).toBe(true)
+  })
+
+  it('gives every versioned record a page a reader can open', () => {
+    // A second version of a record is only useful if it is reachable: the file,
+    // the shell beside it, and the declaration that makes the build emit it.
+    expect(exists('/prototypes/proto-01/doc-v2.md')).toBe(true)
+    expect(exists(SITE_PAGES.proto01DocV2)).toBe(true)
+    expect(published.has(SITE_PAGES.proto01DocV2)).toBe(true)
   })
 })
 
@@ -179,19 +196,58 @@ describe('research records', () => {
   })
 
   it('never records a finding Proto 01 has not earned', () => {
-    // Proto 01 has had no user research. The doc must say so rather than
-    // implying that the interface has been validated.
-    const findings = proto01Doc.split('## Findings')[1]?.split('\n## ')[0] ?? ''
-    expect(findings).toMatch(/no user research/i)
-    expect(findings).not.toMatch(/\d+\s*(participants?|users?|people|sessions?)\s+(tested|observed|completed|took part)/i)
+    // Proto 01 has had no user research. Every version of the record must say so
+    // rather than implying the interface has been validated. A version 2 that
+    // fills in the protocol is exactly where a result could get written by
+    // accident, so the check is over the whole set, not just doc.md.
+    for (const [id, source] of Object.entries(DOCS)) {
+      if (id !== 'proto-01' && id !== 'proto-01-v2') continue
+      const findings = source.split('## Findings')[1]?.split('\n## ')[0] ?? ''
+      expect(findings, `${id} should have a Findings section`).toMatch(/no user research/i)
+      expect(findings, `${id} should not claim participants were run`).not.toMatch(
+        /\d+\s*(participants?|users?|people|sessions?)\s+(tested|observed|completed|took part|were run)/i,
+      )
+    }
   })
 
   it('states that Proto 01 has no findings, rather than omitting the section', () => {
     // An absent Findings heading would let a reader assume the section was
     // forgotten rather than empty on purpose.
-    const findings = proto01Doc.split('## Findings')[1]?.split('\n## ')[0] ?? ''
-    expect(findings.trim()).not.toBe('')
-    expect(findings).toMatch(/no (user research|findings)/i)
+    for (const source of [proto01Doc, proto01DocV2]) {
+      const findings = source.split('## Findings')[1]?.split('\n## ')[0] ?? ''
+      expect(findings.trim()).not.toBe('')
+      expect(findings).toMatch(/no (user research|findings)/i)
+    }
+  })
+
+  it('leaves the preregistered results empty in a record that has no data', () => {
+    // The results table in version 2 is a promise about what will be filled in.
+    // The first column names the measure and is meant to be readable; every
+    // value cell has to be empty, and a row with a number in it is a finding.
+    const results = proto01DocV2.split('## Findings')[1]?.split('\n## ')[0] ?? ''
+    const rows = results.split('\n').filter((line) => /^\|/.test(line) && !/^\|\s*-/.test(line))
+    const body = rows.slice(1)
+    expect(body.length, 'results rows').toBeGreaterThan(5)
+    for (const row of body) {
+      const cells = row.split('|').slice(1, -1)
+      expect(cells[0]?.trim(), `measure name should be present: ${row}`).not.toBe('')
+      for (const cell of cells.slice(1)) {
+        expect(cell.trim(), `value cell should be empty: ${row}`).toBe('')
+      }
+    }
+    expect(results, 'should say the study has not been run').toMatch(/not been run/i)
+  })
+
+  it('records a protocol as a plan, not as a completed study', () => {
+    // Version 2 states a sample and a recruitment route. Both are verbs about
+    // the future, and a record that quietly moves to past tense is the specific
+    // failure this guards against.
+    expect(proto01DocV2.split('## Status')[1]?.split('\n## ')[0] ?? '').toMatch(/not yet run/i)
+    const protocol = proto01DocV2.split('## Research protocol')[1]?.split('\n## ')[0] ?? ''
+    // The decision rule has to be fixed in advance to be worth anything, so the
+    // record must say when it was written.
+    expect(protocol).toMatch(/before running|before data is collected/i)
+    expect(protocol).toMatch(/recruit through/i)
   })
 
   it('marks undecided protocol sections as undefined instead of inventing them', () => {
@@ -349,7 +405,7 @@ describe('markdown renderer', () => {
     expect(html).toContain('href="../shared/evidence-model.md"')
   })
 
-  it('renders both real research records without dropping content', () => {
+  it('renders every research record without dropping content', () => {
     for (const [id, source] of Object.entries(DOCS)) {
       const { html, headings } = renderMarkdown(source)
       // Every heading in the record must survive into the page, and no section
