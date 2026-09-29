@@ -179,6 +179,8 @@
 
       /* --- decisions ------------------------------------------------------ */
       .decisions-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 26px; }
+      .mix { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: 10px 0 0; }
+      .mix .count { font-size: 12px; }
 
       .decision {
         border: 1px solid var(--hairline); border-radius: var(--radius-card);
@@ -200,6 +202,16 @@
 
       .tally { display: inline-flex; gap: 5px; }
       .tally .chip { padding: 2px 6px; font-size: 9px; }
+
+      .dim-chip {
+        font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 2px 6px; border-radius: var(--radius-chip); border: 1px solid var(--ink);
+        background: transparent; color: var(--ink);
+      }
+      .dim-chip[data-dimension='behaviour'] { background: var(--pink); font-weight: 700; }
+
+      .toolbar.dims { margin-top: 10px; }
+      .toolbar.dims .filter[data-dimension][aria-pressed='true'] { background: var(--pink); color: var(--ink); border-color: var(--ink); }
 
       .decision-body { padding: 0 14px 14px 32px; }
       .decision-body .question { margin: 0 0 4px; font-weight: 500; }
@@ -236,6 +248,19 @@
       .candidate .id-chip { background: var(--surface); }
 
       .empty { padding: 24px; text-align: center; color: var(--ink-muted); }
+
+      .questions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+      .question-row {
+        display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px;
+        padding: 13px 15px;
+      }
+      .question-row .qid { font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); }
+      .question-row .qtext { flex: 1; min-width: 260px; }
+      .question-row .why { color: var(--ink-muted); font-size: 12.5px; margin: 5px 0 0; max-width: 74ch; }
+      .no-evidence {
+        font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 2px 6px; border: 1px dashed var(--ink); border-radius: var(--radius-chip); white-space: nowrap;
+      }
 
       footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--hairline); color: var(--ink-muted); font-size: 12px; }
 
@@ -282,6 +307,14 @@
         <h2>The protocol</h2>
         <p class="lede" id="protocol-question"></p>
         <div class="rule-grid" id="protocol"></div>
+        <p class="lede" id="dimension-intro"></p>
+        <div class="rule-grid" id="dimensions"></div>
+      </section>
+
+      <section>
+        <h2>Open behavioural questions</h2>
+        <p class="lede" id="behaviour-intro"></p>
+        <div id="behaviour"></div>
       </section>
 
       <section>
@@ -294,6 +327,7 @@
           <button class="filter" type="button" data-expand="all">Expand all</button>
           <span class="count" id="count"></span>
         </div>
+        <div class="toolbar dims" id="dimension-bar" role="group" aria-label="Filter decisions by what they are about"></div>
         <div id="index"></div>
       </section>
 
@@ -370,7 +404,16 @@
               "say": "supersede proto1 with proto2",
               "means": "Mark proto1 superseded, not deleted. Its results stay readable so the two versions can be compared."
             }
-          ]
+          ],
+          "dimensions": {
+            "behaviour": "What a person does. Only answerable with a real person, so it needs a session or instrumentation rather than an opinion.",
+            "interaction": "How input is wired, and what responds to what.",
+            "layout": "Where things sit and how much space separates them.",
+            "chart": "Whether the mark actually encodes the quantity it claims to.",
+            "visual": "Colour, weight, and surface.",
+            "motion": "Movement and its absence.",
+            "architecture": "What the thing is built from, when the build itself is the decision."
+          }
         },
         "prototypes": [
           {
@@ -411,6 +454,7 @@
                 "id": "data-view/funnel-bars",
                 "screen": "Data View",
                 "question": "How is a funnel bar sized so it can never escape its card?",
+                "dimension": "chart",
                 "solutions": [
                   {
                     "key": "track-fill",
@@ -458,6 +502,7 @@
                 "id": "data-view/bar-emphasis",
                 "screen": "Data View",
                 "question": "How does a bar show that it is not backed by the selected claim?",
+                "dimension": "visual",
                 "solutions": [
                   {
                     "key": "gradient-at-45",
@@ -504,6 +549,7 @@
                 "id": "data-view/trend-line",
                 "screen": "Data View",
                 "question": "How is the trend polyline positioned across its plot?",
+                "dimension": "chart",
                 "solutions": [
                   {
                     "key": "explicit-width",
@@ -541,6 +587,7 @@
                 "id": "data-view/value-label",
                 "screen": "Data View",
                 "question": "Where does the value label sit when its bar reaches the top of the plot?",
+                "dimension": "chart",
                 "solutions": [
                   {
                     "key": "flip-inside",
@@ -578,6 +625,7 @@
                 "id": "data-view/chart-library",
                 "screen": "Data View",
                 "question": "Should the Data View adopt a charting library?",
+                "dimension": "architecture",
                 "open": true,
                 "solutions": [
                   {
@@ -624,6 +672,7 @@
                 "id": "left-pane/heading-spacing",
                 "screen": "Left pane",
                 "question": "How much space sits between a section heading and the content it labels?",
+                "dimension": "layout",
                 "solutions": [
                   {
                     "key": "four-px",
@@ -661,6 +710,7 @@
                 "id": "left-pane/claim-evidence-gap",
                 "screen": "Left pane",
                 "question": "How much space separates a claim from its Evidence row inside the card?",
+                "dimension": "layout",
                 "solutions": [
                   {
                     "key": "eight-px",
@@ -688,6 +738,7 @@
                 "id": "graph/zoom-floor",
                 "screen": "Graph",
                 "question": "How small may the graph zoom when fitting a narrow pane?",
+                "dimension": "interaction",
                 "solutions": [
                   {
                     "key": "floor-072",
@@ -724,6 +775,7 @@
                 "id": "shell/case-switcher",
                 "screen": "Shell",
                 "question": "How does the user move between the three demo cases?",
+                "dimension": "interaction",
                 "solutions": [
                   {
                     "key": "native-select",
@@ -761,6 +813,7 @@
                 "id": "shell/brand-lockup",
                 "screen": "Shell",
                 "question": "What sits in the header beside the product name?",
+                "dimension": "visual",
                 "solutions": [
                   {
                     "key": "mark-and-wordmark",
@@ -798,6 +851,7 @@
                 "id": "shell/pane-count",
                 "screen": "Shell",
                 "question": "Should the three panes stay side by side?",
+                "dimension": "layout",
                 "open": true,
                 "solutions": [
                   {
@@ -826,6 +880,7 @@
                 "id": "state/initial-selection",
                 "screen": "State",
                 "question": "What is selected when the app first opens?",
+                "dimension": "behaviour",
                 "solutions": [
                   {
                     "key": "case-default",
@@ -854,6 +909,7 @@
                 "id": "design/palette",
                 "screen": "Design system",
                 "question": "Which palette defines the product?",
+                "dimension": "visual",
                 "solutions": [
                   {
                     "key": "palette-a-editorial",
@@ -881,6 +937,7 @@
                 "id": "design/motion",
                 "screen": "Design system",
                 "question": "How much motion does the product use?",
+                "dimension": "motion",
                 "solutions": [
                   {
                     "key": "gsap-with-reduced-motion",
@@ -908,17 +965,243 @@
           },
           {
             "id": "proto2",
-            "name": null,
+            "name": "provenance you can check",
             "status": "planned",
-            "summary": "Not started. The next version inherits proto1 as its baseline.",
+            "summary": "The same three panes, tested against what people actually do. proto1 answered thirteen visual questions and one behavioural one, and no question has been put in front of a person, so this version exists to find out whether the layout is solving a problem people have.",
             "prototypeUrl": null,
-            "doc": null,
+            "doc": "proto2.md",
             "userResearch": {
-              "status": "not-collected",
-              "method": null
+              "status": "planned",
+              "method": "Five moderated sessions per question, each one testing a single question against a single case, with a baseline run before any change is made. Start with instrumentation, so the first thing learned is what the product currently does, not what a redesign does."
             },
             "buildMeasurements": [],
-            "decisions": []
+            "decisions": [
+              {
+                "id": "provenance/unprompted-verification",
+                "screen": "Provenance",
+                "question": "Does anyone trace a claim back to its source without being told to?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "This is the premise of the product. If nobody verifies unprompted, the three-pane layout is solving a problem people do not have.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Record the current behaviour, change nothing.",
+                    "hypothesis": "Fewer than a third will open the source for a claim they doubt, because nothing on the surface says the number is unverified until you look.",
+                    "intervention": "No design change. Instrumentation only, recording whether the source pane is opened and for which claim.",
+                    "controlled": "The three cases, the viewport, and the absence of any task instruction.",
+                    "method": "Five moderated sessions. Log the first interaction and whether the source pane is opened at all."
+                  },
+                  {
+                    "key": "surface-the-location",
+                    "status": "untested",
+                    "summary": "Name where each claim is evidenced, on the claim itself.",
+                    "hypothesis": "Naming the evidence location raises unprompted verification, because checking drops from finding a route to one click.",
+                    "intervention": "Add an evidence location line to every claim.",
+                    "controlled": "Cases, viewport, selection model, and the source pane itself all unchanged.",
+                    "method": "The same five sessions repeated with the change in place. Compare the rate of unprompted verification against the baseline."
+                  }
+                ]
+              },
+              {
+                "id": "entry/first-action",
+                "screen": "Entry",
+                "question": "What does someone do first when this opens?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "Whatever the first action is, that is the real entry point of the product. The layout currently assumes it is the Question pane.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Record the first action, change nothing.",
+                    "hypothesis": "Most will read the Question pane before touching anything, and the chart is skipped on the first pass.",
+                    "intervention": "No design change. Record the first click or scroll target and the time to it.",
+                    "controlled": "The landing case, and no instruction about where to begin.",
+                    "method": "Five sessions, first-touch instrumentation, plus what participants say they were trying to do first."
+                  },
+                  {
+                    "key": "narrow-the-entry",
+                    "status": "untested",
+                    "summary": "Open on one question rather than a full pane of context.",
+                    "hypothesis": "People start faster when the first thing is a single question, because there is nothing to choose between yet.",
+                    "intervention": "Collapse the opening state to one question and one action, with the rest behind a step.",
+                    "controlled": "The same landing case, the same question, and the same three panes behind it.",
+                    "method": "The same five sessions, timed from load to first interaction and compared against the baseline."
+                  }
+                ]
+              },
+              {
+                "id": "conflict/chart-vs-source",
+                "screen": "Conflict",
+                "question": "What does someone do when the chart and the source text disagree?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "This is the case the product exists for. If people resolve it wrongly and confidently, the layout is not saving them.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Record the resolution, change nothing.",
+                    "hypothesis": "They will believe the source text and mentally discount the chart, and will not notice a contradiction badge on the bar.",
+                    "intervention": "No design change. Observe the contradicted case and record the first move and the final answer.",
+                    "controlled": "The contradicted case, unchanged, with the question \"is this safe to act on?\"",
+                    "method": "Five sessions on the contradicted case. Record the final answer and whether the disagreement was ever noticed."
+                  },
+                  {
+                    "key": "name-the-disagreement",
+                    "status": "untested",
+                    "summary": "State the disagreement in words where the claim is read.",
+                    "hypothesis": "Naming the conflict on the claim catches attention the badge does not, because it arrives where the decision is being made.",
+                    "intervention": "Replace the badge with a sentence naming what disagrees.",
+                    "controlled": "Cases, chart, and source pane unchanged.",
+                    "method": "Same five sessions, compared against the baseline rate of noticing the contradiction."
+                  }
+                ]
+              },
+              {
+                "id": "trust/evidence-states",
+                "screen": "Trust",
+                "question": "Do people tell \"unverified\" apart from \"contradicted\"?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "Unverified and contradicted are not the same claim about the world. If the interface cannot make them feel different, the model is decorative.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Record how the two states are read, change nothing.",
+                    "hypothesis": "Both are read as \"bad\" and produce the same response, so the distinction the model is built on is not perceived.",
+                    "intervention": "No design change. Show both states and ask which is worse and why.",
+                    "controlled": "The same two claims, unchanged, asked in the same words.",
+                    "method": "Five sessions. Record the ranking each person gives the two states and the reason they give."
+                  },
+                  {
+                    "status": "untested",
+                    "key": "separate-the-states",
+                    "summary": "Give the two evidence states different colour and different wording.",
+                    "hypothesis": "Differentiating the states by both colour and phrase makes the difference legible without the person having to infer it.",
+                    "intervention": "Differentiate unverified and contradicted by colour and by wording.",
+                    "controlled": "The same claims, in the same place, with the same wording otherwise.",
+                    "method": "The same five sessions, asking which state is worse and why, and comparing the rankings."
+                  }
+                ]
+              },
+              {
+                "id": "selection/bidirectional",
+                "screen": "Selection",
+                "question": "Is the shared selection understood in both directions?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "The shared selection is the core idea. It only works if people predict it, so the surprise rate is the number that matters.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Ask what will happen before it happens, change nothing.",
+                    "hypothesis": "Clicking a bar is understood as selecting evidence, but clicking source text is not predicted to connect to the chart.",
+                    "intervention": "No design change. Ask for a prediction before each click, then let them click.",
+                    "controlled": "The same three panes and the same cases.",
+                    "method": "Five sessions. Record the prediction and the surprise rate for each direction of the link."
+                  },
+                  {
+                    "key": "show-the-link",
+                    "status": "untested",
+                    "summary": "Make the connection visible at the moment it happens.",
+                    "hypothesis": "Showing what just changed in the other two panes makes the link predictable, because the behaviour is no longer invisible.",
+                    "intervention": "Mark the matched element in both other panes when a selection is made.",
+                    "controlled": "The same three panes, the same cases, and the same selection model.",
+                    "method": "The same five sessions, predicting before each click, and comparing the surprise rate against the baseline."
+                  }
+                ]
+              },
+              {
+                "id": "chart/funnel-ordering",
+                "screen": "Chart",
+                "question": "Can someone rank the sources by size without reading the labels?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "A funnel is a ranking, so reading the order off it should not need the labels. If it does, the encoding is not doing the work.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Test the current funnel, change nothing.",
+                    "hypothesis": "Bar length alone does not support ranking, because there is no shared baseline to compare against.",
+                    "intervention": "No design change. Show the funnel for five seconds, then ask for the ranking.",
+                    "controlled": "The same case and viewport, with the labels still present but not pointed at.",
+                    "method": "Five sessions. Record the ranking produced and compare it against the true order."
+                  },
+                  {
+                    "status": "untested",
+                    "key": "add-the-baseline",
+                    "summary": "Give the bars a shared zero line and drop the value labels.",
+                    "hypothesis": "A shared baseline makes the ranking legible on its own, so the labels stop carrying the meaning the encoding should be carrying.",
+                    "intervention": "Add a zero line to the funnel and remove the value labels.",
+                    "controlled": "The same case, the same ordering, and the same emphasis rule.",
+                    "method": "The same five sessions, asked for the same ranking, and compared against the baseline accuracy."
+                  }
+                ]
+              },
+              {
+                "id": "case/switching-cost",
+                "screen": "Case switching",
+                "question": "What does switching between cases cost someone?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "The three cases share a model, so switching should be cheap. Measuring it is the only way to know whether it is.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Measure the cost of switching, change nothing.",
+                    "hypothesis": "Switching reads as a reset, because nothing signals what changed, so people re-read the question each time.",
+                    "intervention": "No design change. Time the switch and record what people do immediately after.",
+                    "controlled": "The three cases, switching in a fixed order.",
+                    "method": "Five sessions. Time from switch to first interaction, and whether the question is re-read."
+                  },
+                  {
+                    "status": "untested",
+                    "key": "signal-what-changed",
+                    "summary": "Show what is different in the case just switched to.",
+                    "hypothesis": "Marking the differences removes most of the re-reading, because the cost of switching is not knowing what to trust any more.",
+                    "intervention": "On switching cases, highlight the fields that differ from the one just left.",
+                    "controlled": "The three cases, their content, and the switch mechanism itself.",
+                    "method": "The same five sessions, timing the switch to first interaction and counting how often the question is re-read."
+                  }
+                ]
+              },
+              {
+                "id": "unsupported/no-evidence",
+                "screen": "Unsupported",
+                "question": "What does someone do with a claim that has no evidence behind it?",
+                "dimension": "behaviour",
+                "open": true,
+                "openNote": "There is no empty state, because the local data is always present. A real claim set would have one, and nobody has seen it.",
+                "solutions": [
+                  {
+                    "key": "instrument-baseline",
+                    "status": "untested",
+                    "summary": "Watch what happens with the least-supported claim in the current data, change nothing.",
+                    "hypothesis": "People read a claim with no citation as an oversight rather than as a finding, and go looking for the citation elsewhere instead of treating the gap as the answer.",
+                    "intervention": "No design change. Observe the weakest claim in the current data.",
+                    "controlled": "The same three cases and the same wording, with the gap left exactly as it is.",
+                    "method": "Five sessions. Record whether they classify the gap, ignore it, or search elsewhere for an explanation."
+                  },
+                  {
+                    "key": "build-the-state",
+                    "status": "untested",
+                    "summary": "Give the claim somewhere to go when nothing supports it.",
+                    "hypothesis": "People will treat a claim with no evidence as a gap in their own understanding rather than as a finding, and will look elsewhere for the explanation.",
+                    "intervention": "Add the missing state, so a claim can be recorded as unsupported instead of merely lacking a citation.",
+                    "controlled": "Cases, panes, and selection model unchanged.",
+                    "method": "Five sessions on a case containing an unsupported claim. Record whether they classify it, ignore it, or go looking."
+                  }
+                ]
+              }
+            ],
+            "openQuestions": 8
           }
         ]
       }
@@ -941,13 +1224,17 @@
       /** Full id for one solution, e.g. proto1/data-view/trend-line/explicit-width */
       const solutionId = (proto, decision, solution) => proto.id + '/' + decision.id + '/' + solution.key
 
-      /** Every untested solution in the shipped version, offered as the next thing to try. */
+      /** Untested options in a version, behavioural questions first: the whole
+       *  point of the workbench is not to keep polishing what already looks fine. */
       const nextCandidates = (from) =>
-        from.decisions.flatMap((d) =>
-          d.solutions
-            .filter((s) => s.status === 'untested')
-            .map((s) => ({ decision: d, solution: s, id: from.id + '/' + d.id + '/' + s.key })),
-        )
+        from.decisions
+          .slice()
+          .sort((a, b) => (a.dimension === 'behaviour' ? 0 : 1) - (b.dimension === 'behaviour' ? 0 : 1))
+          .flatMap((d) =>
+            d.solutions
+              .filter((s) => s.status === 'untested')
+              .map((s) => ({ decision: d, solution: s, id: from.id + '/' + d.id + '/' + s.key })),
+          )
 
       // --- "How to direct me" -----------------------------------------------
       const rules = document.getElementById('rules')
@@ -966,17 +1253,84 @@
         protocolEl.append(row)
       }
 
+      const DIMENSION_ORDER = ['behaviour', 'interaction', 'layout', 'chart', 'visual', 'motion', 'architecture']
+      const dimNames = DIMENSION_ORDER.filter((d) => Object.keys(C.dimensions).includes(d))
+
+      const dimensionsEl = document.getElementById('dimensions')
+      for (const name of dimNames) {
+        const row = el('div', 'panel rule')
+        row.append(el('span', 'say', name), el('span', 'means', C.dimensions[name]))
+        dimensionsEl.append(row)
+      }
+      document.getElementById('dimension-intro').textContent =
+        'Every decision is also tagged with what it is about, because a visual question and a ' +
+        'behavioural one are answered by different evidence. A behavioural question cannot be ' +
+        'settled by looking at the screen; it needs a person or a log.'
+
+      // --- open behavioural questions ----------------------------------------
+      // These are standing questions, not per-version work, so they are listed
+      // here rather than buried inside whichever version happens to own them.
+      const allDecisions = manifest.prototypes.flatMap((p) => p.decisions.map((d) => ({ proto: p, decision: d })))
+
+      // A behavioural question counts as answered only if it has a result AND
+      // its version actually collected user evidence. A code change is not an
+      // answer to "what does a person do".
+      const hasUserEvidence = (proto) => proto.userResearch && proto.userResearch.status === 'collected'
+      const isAnswered = ({ proto, decision }) =>
+        hasUserEvidence(proto) && decision.solutions.some((s) => s.status === 'shipped' && s.result)
+
+      const behaviourRows = allDecisions.filter(({ decision }) => decision.dimension === 'behaviour')
+      const answered = behaviourRows.filter(isAnswered)
+      document.getElementById('behaviour-intro').textContent =
+        behaviourRows.length + ' questions about what a person does, ' +
+        answered.length + (answered.length === 1 ? ' has' : ' have') + ' been answered with a person in the loop. ' +
+        'A redesign cannot answer any of them, so they are listed here whatever version they belong to.'
+
+      const behaviourEl = document.getElementById('behaviour')
+      if (behaviourRows.length === 0) {
+        behaviourEl.append(el('div', 'panel empty', 'No behavioural questions recorded.'))
+      }
+      for (const { proto, decision } of behaviourRows) {
+        const row = el('div', 'panel question-row')
+        row.append(el('span', 'dim-chip', 'behaviour'))
+        const text = el('div', 'qtext')
+        text.append(el('div', null, decision.question))
+        if (decision.openNote) text.append(el('p', 'why', decision.openNote))
+        row.append(text)
+        row.append(el('span', 'qid', proto.id + '/' + decision.id))
+        row.append(el('span', 'no-evidence', isAnswered({ proto, decision }) ? 'answered' : 'no evidence yet'))
+        behaviourEl.append(row)
+      }
+
       const index = document.getElementById('index')
       const countEl = document.getElementById('count')
       const search = document.getElementById('q')
       const filterButtons = [...document.querySelectorAll('.filter[data-filter]')]
 
+      const dimensionBar = document.getElementById('dimension-bar')
+      const dimensionButtons = []
+      {
+        const present = new Set(allDecisions.map(({ decision }) => decision.dimension))
+        for (const name of DIMENSION_ORDER.filter((d) => present.has(d))) {
+          const b = el('button', 'filter', name)
+          b.type = 'button'
+          b.dataset.dimension = name
+          b.setAttribute('aria-pressed', 'false')
+          const n = allDecisions.filter(({ decision }) => decision.dimension === name).length
+          b.textContent = name + ' ' + n
+          dimensionBar.append(b)
+          dimensionButtons.push(b)
+        }
+      }
+
       let filter = 'all'
+      let dimension = 'all'
       let query = ''
 
       const decisionMatches = (proto, decision) => {
+        if (dimension !== 'all' && decision.dimension !== dimension) return false
         if (!query) return true
-        const hay = [proto.id, decision.id, decision.question, decision.screen,
+        const hay = [proto.id, decision.id, decision.question, decision.screen, decision.dimension,
           ...decision.solutions.map((s) => s.key + ' ' + s.summary)].join(' ').toLowerCase()
         return query.split(/\s+/).every((term) => hay.includes(term))
       }
@@ -1084,6 +1438,10 @@
         const summary = el('summary')
         summary.append(el('strong', null, decision.question))
         if (decision.open) summary.append(chip('open'))
+        const dim = el('span', 'dim-chip', decision.dimension)
+        dim.dataset.dimension = decision.dimension
+        dim.title = C.dimensions[decision.dimension] || ''
+        summary.append(dim)
 
         const tally = el('span', 'tally')
         for (const status of ['shipped', 'untested', 'rejected']) {
@@ -1096,6 +1454,7 @@
 
         const body = el('div', 'decision-body')
         body.append(el('p', 'label', decision.screen))
+        if (decision.openNote) body.append(el('p', 'why', decision.openNote))
 
         const list = el('div', 'solutions')
         const solutions = [...decision.solutions].sort(
@@ -1192,10 +1551,28 @@
           const decisions = proto.decisions.filter((d) => decisionMatches(proto, d))
           const dhead = el('div', 'decisions-head')
           dhead.append(
-            el('h4', null, decisions.length ? 'Decisions tested' : 'No decisions recorded yet'),
+            el('h4', null, decisions.length ? 'Decisions tested' : 'Questions this version will test'),
             el('span', 'count', decisions.length + ' of ' + proto.decisions.length),
           )
           card.append(dhead)
+
+          // Say plainly how much of this version was about appearance, because
+          // that ratio is the finding and it is easy to miss.
+          if (proto.decisions.length) {
+            const mix = el('p', 'mix')
+            for (const name of DIMENSION_ORDER) {
+              const n = proto.decisions.filter((d) => d.dimension === name).length
+              if (n === 0) continue
+              const b = el('span', 'dim-chip', name + ' ' + n)
+              b.dataset.dimension = name
+              mix.append(b)
+            }
+            const evidence = proto.userResearch && proto.userResearch.status === 'collected'
+            mix.append(el('span', 'count', evidence
+              ? 'has user evidence'
+              : 'no decision in this version has been put in front of a person'))
+            card.append(mix)
+          }
 
           for (const decision of decisions) card.append(decisionEl(proto, decision))
 
@@ -1237,6 +1614,16 @@
         b.addEventListener('click', () => {
           filter = b.dataset.filter
           for (const other of filterButtons) other.setAttribute('aria-pressed', String(other === b))
+          render()
+        })
+      }
+
+      for (const b of dimensionButtons) {
+        b.addEventListener('click', () => {
+          dimension = b.dataset.dimension === dimension ? 'all' : b.dataset.dimension
+          for (const other of dimensionButtons) {
+            other.setAttribute('aria-pressed', String(other.dataset.dimension === dimension))
+          }
           render()
         })
       }

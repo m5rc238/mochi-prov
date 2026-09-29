@@ -46,7 +46,9 @@ type Decision = {
   id: string
   screen: string
   question: string
+  dimension: string
   open?: boolean
+  openNote?: string
   solutions: Solution[]
 }
 
@@ -59,6 +61,7 @@ type Version = {
   summary?: string
   prototypeUrl: string | null
   doc: string | null
+  openQuestions?: number
   userResearch: { status: string; method?: string | null; notes?: string }
   buildMeasurements: Measurement[]
   decisions: Decision[]
@@ -73,6 +76,7 @@ type Manifest = {
     prototypeStatuses: Record<string, string>
     solutionStatuses: Record<string, string>
     evidenceKinds: Record<string, string>
+    dimensions: Record<string, string>
     protocol: { question: string; fields: { name: string; means: string }[] }
     rules: { say: string; means: string }[]
   }
@@ -89,7 +93,6 @@ const extract = (): Manifest => {
 
 const manifest = extract()
 const shipped = manifest.prototypes.filter((p) => p.status === 'current')
-const planned = manifest.prototypes.filter((p) => p.status === 'planned')
 const allDecisions = manifest.prototypes.flatMap((p) =>
   p.decisions.map((d) => ({ proto: p, decision: d })),
 )
@@ -116,7 +119,6 @@ describe('experiment workbench', () => {
       if (proto.status === 'planned') {
         // A version that does not exist yet must not claim to have run.
         expect(proto.prototypeUrl, `"${proto.id}" is planned, so it has nothing to link to`).toBeNull()
-        expect(proto.doc, `"${proto.id}" is planned, so it has no doc yet`).toBeNull()
       } else {
         expect(proto.name, `"${proto.id}" should be named`).toBeTruthy()
       }
@@ -124,9 +126,13 @@ describe('experiment workbench', () => {
   })
 
   it('points each built version at a prototype and a doc that exist', () => {
-    for (const proto of manifest.prototypes.filter((p) => p.status !== 'planned')) {
-      expect(proto.prototypeUrl, `"${proto.id}" should link to its prototype`).toMatch(/^https?:\/\//)
-      expect(proto.doc, `"${proto.id}" should link to its doc`).toBeTruthy()
+    for (const proto of manifest.prototypes) {
+      if (proto.status !== 'planned') {
+        expect(proto.prototypeUrl, `"${proto.id}" should link to its prototype`).toMatch(/^https?:\/\//)
+      }
+      // A planned version can still have a document: stating what it will test
+      // is the point of writing it down before building it.
+      if (!proto.doc) continue
       const key = Object.keys(docs).find((k) => k.endsWith(proto.doc!.split('/').pop()!))
       expect(key, `the doc for "${proto.id}" (${proto.doc}) should exist in experiments/`).toBeDefined()
     }
@@ -154,13 +160,35 @@ describe('experiment workbench', () => {
     }
   })
 
-  it('names exactly one shipped solution per decision', () => {
+  it('tags every decision with what it is about', () => {
     for (const { proto, decision } of allDecisions) {
-      const built = decision.solutions.filter((s) => s.status === 'shipped')
+      const where = `${proto.id}/${decision.id}`
       expect(
-        built.length,
-        `"${proto.id}/${decision.id}" should have exactly one shipped option, found ${built.length}`,
-      ).toBe(1)
+        manifest.conventions.dimensions[decision.dimension],
+        `${where} is tagged "${decision.dimension}", which is not a known dimension`,
+      ).toBeTruthy()
+    }
+    // The point of the dimension is to separate what a person does from how it
+    // looks, so both kinds have to actually be in use.
+    const used = new Set(allDecisions.map(({ decision }) => decision.dimension))
+    expect(used.has('behaviour'), 'no decision is tagged as behavioural').toBe(true)
+    expect(used.size, 'every decision being the same kind of question is not a taxonomy').toBeGreaterThan(1)
+  })
+
+  it('ships one option per decision in a built version, and none in a planned one', () => {
+    for (const proto of manifest.prototypes) {
+      for (const decision of proto.decisions) {
+        const where = `${proto.id}/${decision.id}`
+        const built = decision.solutions.filter((s) => s.status === 'shipped')
+        if (proto.status === 'planned') {
+          expect(built.length, `${where} is planned, so nothing can be shipped in it yet`).toBe(0)
+        } else {
+          expect(
+            built.length,
+            `${where} should have exactly one shipped option, found ${built.length}`,
+          ).toBe(1)
+        }
+      }
     }
   })
 
@@ -212,7 +240,8 @@ describe('experiment workbench', () => {
 
   it('points every shipped option at real code', () => {
     for (const { proto, decision } of allDecisions) {
-      const built = decision.solutions.find((s) => s.status === 'shipped')!
+      const built = decision.solutions.find((s) => s.status === 'shipped')
+      if (!built) continue
       const target = built.target ?? ''
       expect(target, `"${proto.id}/${decision.id}" should record where its shipped option lives`).toMatch(
         /^src\/[\w./-]+:\d+$/,
@@ -287,13 +316,58 @@ describe('experiment workbench', () => {
     }
   })
 
-  it('keeps a slot open for the next version', () => {
-    // The workbench is meant to be extended by asking for another version, so
-    // there should always be somewhere to put one.
-    expect(planned.length, 'there should be a planned version to build next').toBeGreaterThan(0)
-    for (const proto of planned) {
-      expect(proto.decisions.length, `"${proto.id}" is planned, so it should carry no results yet`).toBe(0)
+  it('keeps a standing set of behavioural questions, and none of them answered by guesswork', () => {
+    // Behaviour is the thing a redesign cannot answer, so it has to stay
+    // visible as a standing list rather than being buried in a version.
+    const behavioural = allDecisions.filter(({ decision }) => decision.dimension === 'behaviour')
+    expect(behavioural.length, 'there should be behavioural questions on the workbench').toBeGreaterThan(0)
+
+    // An open question is one with nothing shipped yet. A behavioural decision
+    // that has already shipped is a decision, not an open question, so the
+    // research discipline below applies to the open ones.
+    const open = behavioural.filter(({ decision }) => !decision.solutions.some((s) => s.status === 'shipped'))
+    expect(open.length, 'there should be behavioural questions still waiting to be answered').toBeGreaterThan(0)
+
+    for (const { proto, decision } of open) {
+      const where = `${proto.id}/${decision.id}`
+      expect(decision.openNote, `${where} should say why the question matters`).toBeTruthy()
+      for (const solution of decision.solutions) {
+        expect(
+          solution.method,
+          `${where}/${solution.key} is behavioural, so it needs a method someone could actually run`,
+        ).toBeTruthy()
+        expect(
+          solution.result,
+          `${where}/${solution.key} is behavioural, so it must not carry a result until it is observed`,
+        ).toBeFalsy()
+      }
+    }
+  })
+
+  it('makes the first move on an open behavioural question a measurement, not a redesign', () => {
+    const open = allDecisions.filter(
+      ({ decision }) =>
+        decision.dimension === 'behaviour' && !decision.solutions.some((s) => s.status === 'shipped'),
+    )
+    for (const { proto, decision } of open) {
+      expect(
+        decision.solutions[0]!.key,
+        `${proto.id}/${decision.id} should start by instrumenting, so a later change has a baseline to be compared against`,
+      ).toBe('instrument-baseline')
+    }
+  })
+
+  it('keeps a planned version to declaring questions, with no results yet', () => {
+    const plannedVersions = manifest.prototypes.filter((p) => p.status === 'planned')
+    expect(plannedVersions.length, 'there should be a version to build next').toBeGreaterThan(0)
+    for (const proto of plannedVersions) {
+      expect(proto.decisions.length, `"${proto.id}" should state the questions it exists to answer`).toBeGreaterThan(0)
       expect(proto.buildMeasurements.length, `"${proto.id}" is planned, so it should have no measurements yet`).toBe(0)
+      for (const decision of proto.decisions) {
+        for (const solution of decision.solutions) {
+          expect(solution.result, `"${proto.id}/${decision.id}/${solution.key}" is planned, so it has no result`).toBeFalsy()
+        }
+      }
     }
   })
 

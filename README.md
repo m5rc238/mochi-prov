@@ -38,9 +38,18 @@ Versions and decisions both have stable ids, so a change request can be scoped p
 
 Each option is recorded as a protocol entry: hypothesis, the single variable changed, what was held
 constant, how success would be judged, and the result. Rejected options keep their reason so the
-same idea is not re-proposed. The workbench distinguishes **build measurements** (numbers from the
-running app) from **user research** (nothing collected yet), so a layout number is never mistaken for
-evidence that the design works.
+same idea is not re-proposed.
+
+Every decision is also tagged with what it is about — `behaviour`, `interaction`, `layout`, `chart`,
+`visual`, `motion`, `architecture` — because a visual question and a behavioural one need different
+evidence. **Behavioural questions get a standing section at the top of the page**, since they cannot
+be answered by looking at the screen. `proto1` tested 14 decisions, exactly one of them behavioural,
+and none has been put in front of a person. `proto2` exists to close that gap: eight behavioural
+questions, each starting by instrumenting the current build before anything is changed.
+
+The workbench distinguishes **build measurements** (numbers from the running app) from **user
+research** (nothing collected yet), so a layout number is never mistaken for evidence that the
+design works.
 
 It is a standalone page with no build step:
 
@@ -50,8 +59,15 @@ open experiments/index.html
 
 Its embedded manifest is the single source of truth, validated by `src/test/experiments.test.ts`. The
 tests fail the build on a duplicate id, a second shipped option, a missing protocol field, an
-untested option claiming a result, a rejected option without evidence, a stale code reference, or an
-addressing rule pointing at something that does not exist.
+untested option claiming a result, a rejected option without evidence, a stale code reference, a
+behavioural question answered without a person, an addressing rule pointing at something that does
+not exist, or a doc link that does not resolve.
+
+## Documents
+
+Each version has its own document next to the workbench: `experiments/proto1.md` for what the current
+version is, `experiments/proto2.md` for what the next one will test. `design.md` remains the visual
+system and component-level reference.
 
 ## Commands
 
