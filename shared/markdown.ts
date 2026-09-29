@@ -35,10 +35,15 @@ const renderInline = (text: string): string => {
   // Code spans first: their contents are literal, so nothing inside them is
   // treated as emphasis or a link. They are lifted out behind a sentinel that
   // cannot occur in escaped prose, then restored once the rest is rendered.
+  //
+  // The captured contents are escaped here rather than on restore, because they
+  // come off the raw line: escaping afterwards would be too late, since the
+  // restore step splices them in as markup. Without this, a doc containing
+  // `` `<script>…</script>` `` would render a live script element.
   const SENTINEL = '\u0001CODE'
   const codeSpans: string[] = []
   let working = text.replace(/`([^`]+)`/g, (_match, code: string) => {
-    codeSpans.push(`<code>${code}</code>`)
+    codeSpans.push(`<code>${escapeHtml(code)}</code>`)
     return `${SENTINEL}${codeSpans.length - 1}${SENTINEL}`
   })
 

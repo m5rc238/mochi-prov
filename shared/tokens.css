@@ -1,0 +1,240 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   The design system — the parts that are not about any one page.
+   Derived from /design.md. Palette A (Editorial) is the application surface:
+   the product is a reading and inspection tool, so the warm off-white canvas
+   carries the longform source text. Palette B contributes indicator colours
+   only. Gaps in design.md (spacing base, radii, borders, surfaces, type scale,
+   interaction states) are filled in section 3 of design.md.
+
+   This file is the single definition of the tokens and the shared type roles.
+   The prototype (`prototypes/proto-01/app/src/index.css`) and the research
+   catalog's documentation (`shared/site.css`) both import it, so the two cannot
+   drift into different systems. A rule belongs here if both need it; anything
+   specific to one surface belongs in that surface's file.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Surfaces */
+  --color-canvas: #faf7f2;
+  --color-surface: #fffdfa;
+  --color-sunken: #f2ece2;
+
+  /* Ink */
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #6e6e6e;
+  --color-rule: #b5b5b5;
+
+  /* Highlight accents (Palette A) */
+  --color-accent-pink: #f4b8d5;
+  --color-accent-mint: #a4e7d0;
+  --color-accent-peri: #c5cef8;
+
+  /* Indicator status colours (Palette B) */
+  --color-status-scarlet: #ff5a5f;
+  --color-status-orange: #ffb347;
+  --color-status-lavender: #b39ddb;
+  --color-status-sky: #90caf9;
+
+  /* Type */
+  --font-serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'Space Mono', 'SFMono-Regular', Menlo, monospace;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii */
+  --radius-chip: 2px;
+  --radius-card: 4px;
+  --radius-pill: 9999px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-ink) 55%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* --- Metadata label: Space Mono, uppercase ------------------------------ */
+  .ds-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  /* --- Section heading: a label that introduces a block of content. The
+     4px separates the 10px mono label from the 21-23px serif copy below it;
+     flush against it, the two read as one crowded block. ------------------------ */
+  .ds-section-heading {
+    margin-bottom: 4px;
+  }
+
+  /* --- Panel: hairline-ruled surface. No shadows anywhere in this system. - */
+  .ds-panel {
+    background-color: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  .ds-divider {
+    border-color: color-mix(in srgb, var(--color-rule) 60%, transparent);
+  }
+
+  /* --- Select: native control, restyled to the hairline surface. --------- */
+  .ds-select {
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+
+  /* The popup itself is drawn by the OS, so its colours come from the
+     `color-scheme` declaration on :root rather than from these rules. */
+  .ds-select option {
+    color: var(--color-ink);
+    background-color: var(--color-surface);
+  }
+
+  /* --- Type roles --------------------------------------------------------- */
+  .ds-display {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .ds-body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .ds-caption {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--color-ink-muted);
+  }
+
+  /* Controls sit between body copy and captions: a select or a button is read
+     before it is acted on, so it is held at 500 weight and never below 13px. */
+  .ds-control {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    /* 1.5, not 1.4: this is the leading the control already inherits from the
+       body, and naming it must not resize the control. A role records what the
+       build does — it does not get to decide something different. */
+    line-height: 1.5;
+  }
+
+  /* --- Accent wash. Accents are fills, never text. ------------------------ */
+  .ds-chip {
+    border-radius: var(--radius-chip);
+    padding: 2px 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .ds-entity-question,
+  .ds-entity-source {
+    --ds-accent: var(--color-rule);
+  }
+  .ds-entity-answer {
+    --ds-accent: var(--color-accent-peri);
+  }
+  .ds-entity-claim {
+    --ds-accent: var(--color-accent-pink);
+  }
+  .ds-entity-evidence {
+    --ds-accent: var(--color-accent-mint);
+  }
+  .ds-entity-sourceParagraph {
+    --ds-accent: var(--color-rule);
+  }
+
+  .ds-accent-bar {
+    background-color: var(--ds-accent);
+  }
+
+  .ds-chip-bg {
+    background-color: color-mix(in srgb, var(--ds-accent) 34%, transparent);
+  }
+
+  /* --- The mesh gradient, as a 3px rule and never as a fill. ---------------
+     Filled, it out-shouts the type; as a hairline it keeps the atmosphere and
+     the calm. Position is left to the caller, because the prototype lays it
+     over a header's lower edge and the site lays it under a header, and only
+     the appearance is shared. */
+  .ds-mesh-rule {
+    height: 3px;
+    background-image: linear-gradient(135deg, #ffa07a 0%, #f4a261 35%, #e8a5c8 70%, #a5c4f0 100%);
+  }
+
+  /* --- A button or link styled as an action -------------------------------
+     The system's only control shape: a hairline-ruled surface that tints one
+     step on hover, never a shadow and never a lift. `action-primary` is the
+     one filled state, and it darkens by one ink step rather than to a new
+     colour. */
+  .action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .action:hover {
+    background-color: var(--color-sunken);
+    border-color: var(--color-rule);
+  }
+
+  .action-primary {
+    background-color: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  /* Ink darkens by mixing toward itself, so the hover stays inside the
+     palette instead of reaching for a black that design.md does not define. */
+  .action-primary:hover {
+    background-color: color-mix(in srgb, var(--color-ink) 88%, black);
+    border-color: color-mix(in srgb, var(--color-ink) 88%, black);
+    color: var(--color-canvas);
+  }
+
+  /* Reduced motion: state changes stay, movement goes. Every transition in the
+     system collapses to an instant state change, so behaviour is identical and
+     only the movement is dropped. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

@@ -312,6 +312,20 @@ describe('markdown renderer', () => {
     expect(html).not.toContain('<em>')
   })
 
+  it('escapes HTML inside an inline code span', () => {
+    // The code span is lifted off the raw line before the rest of the text is
+    // escaped, so it has to be escaped where it is captured. Otherwise a doc
+    // that quotes a tag in backticks would render that tag as live markup.
+    const { html } = renderMarkdown('use `<script>alert(1)</script>` here\n')
+    expect(html).toContain('<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>')
+    expect(html).not.toContain('<script>')
+  })
+
+  it('escapes HTML inside an inline code span that also contains quotes and ampersands', () => {
+    const { html } = renderMarkdown('`a && b == "c" < d`\n')
+    expect(html).toContain('<code>a &amp;&amp; b == &quot;c&quot; &lt; d</code>')
+  })
+
   it('renders blockquotes and rules', () => {
     const { html } = renderMarkdown('> quoted line\n> continued\n\n---\n')
     expect(html).toContain('<blockquote>quoted line continued</blockquote>')

@@ -20,14 +20,19 @@ app.textContent = ''
 
 /* --- Header ---------------------------------------------------------------- */
 const header = el('header', 'site-header sticky top-0 z-10')
-const headerInner = el('div', 'mx-auto flex max-w-3xl items-center gap-4 px-8 py-4')
-const brand = el('a', 'site-link ds-label')
+// The 3px mesh gradient, as a rule and not a fill: a hairline keeps the
+// atmosphere without out-shouting the type. Same use as the prototype header.
+const mesh = el('div', 'ds-mesh-rule')
+header.append(mesh)
+const headerInner = el('div', 'mx-auto flex max-w-5xl items-center gap-6 px-8 py-4')
+const brand = el('a', 'site-nav text-ink')
 brand.href = '/experiments/'
 brand.textContent = 'Research index'
+brand.setAttribute('aria-current', 'page')
 headerInner.append(brand)
 const headerSpacer = el('div')
 headerInner.append(headerSpacer)
-const modelLink = el('a', 'site-link')
+const modelLink = el('a', 'site-nav')
 modelLink.href = '/shared/evidence-model.html'
 modelLink.textContent = 'Evidence model'
 headerInner.append(modelLink)
@@ -35,17 +40,17 @@ header.append(headerInner)
 app.append(header)
 
 /* --- Research question ----------------------------------------------------- */
-const main = el('main', 'mx-auto max-w-3xl px-8 pt-16 pb-24')
+const main = el('main', 'mx-auto max-w-5xl px-8 pt-16 pb-24')
 
 const questionSection = el('section')
-const questionLabel = el('p', 'ds-label')
+const questionLabel = el('p', 'ds-label ds-section-heading')
 questionLabel.textContent = 'Research question'
 questionSection.append(questionLabel, el('h1', 'question mt-3', RESEARCH.question))
 main.append(questionSection)
 
 /* --- Prototypes ------------------------------------------------------------ */
 const protoSection = el('section', 'mt-20')
-const protoLabel = el('p', 'ds-label')
+const protoLabel = el('p', 'ds-label ds-section-heading')
 protoLabel.textContent = 'Prototypes'
 protoSection.append(protoLabel)
 
@@ -56,7 +61,7 @@ for (const proto of PROTOTYPES) {
   card.dataset.prototype = proto.id
 
   const meta = el('div', 'proto-meta')
-  const number = el('span', 'proto-number', `Proto ${proto.number}`)
+  const number = el('span', 'ds-label', `Proto ${proto.number}`)
   const title = el('h2', 'proto-title')
   // The whole card is not clickable: the two actions are the links, and a
   // nested interactive region inside a link is an accessibility trap.
@@ -68,7 +73,7 @@ for (const proto of PROTOTYPES) {
   card.append(chain)
 
   const footer = el('div', 'mt-5 flex flex-wrap items-center gap-3')
-  const status = el('span', `status status-${proto.status}`)
+  const status = el('span', `ds-chip status status-${proto.status}`)
   status.textContent = proto.status
   footer.append(status)
 
@@ -102,12 +107,12 @@ protoSection.append(list)
 main.append(protoSection)
 
 /* --- Footer ---------------------------------------------------------------- */
-const footer = el('footer', 'mx-auto max-w-3xl border-t px-8 py-8 ds-divider')
+const footer = el('footer', 'mx-auto max-w-5xl border-t px-8 py-8 ds-divider')
 const footerNote = el('p', 'ds-caption')
 footerNote.textContent =
   'This is a research catalog. Each prototype’s documentation is the source of truth for what it is and what has been observed about it.'
 const designNote = el('p', 'ds-caption mt-2')
-designNote.append('Visual system: ', el('code', '', 'design.md'))
+designNote.append('Visual system: ', el('code', 'site-code', 'design.md'))
 footer.append(footerNote, designNote)
 main.append(footer)
 app.append(main)

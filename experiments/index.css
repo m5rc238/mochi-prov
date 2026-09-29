@@ -1,31 +1,31 @@
-/* Catalog. Hand-written rather than generated: the data lives in
- * shared/catalog.ts, and this file is the only view of it. */
+/* ---------------------------------------------------------------------------
+   The research catalog's own styles. The data lives in `shared/catalog.ts` and
+   the system in `shared/site.css`; this file is the only view of the former and
+   adds nothing to the latter. Where a role exists, it is composed rather than
+   re-declared, so the catalog cannot drift into a second visual language.
+--------------------------------------------------------------------------- */
 
 @import '../shared/site.css';
 
 @layer components {
   /* The research question is the reason the page exists, so it is set as
-   * editorial copy — serif, generous measure — not as a card. */
+   * editorial copy — serif, generous measure — not as a card. `ds-display` is
+   * fluid in the system, so this follows the viewport rather than fixing a
+   * size the interface has no other use for. */
   .question {
     font-family: var(--font-serif);
-    font-size: 28px;
+    font-size: clamp(24px, 3.4vw, 30px);
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 1.28;
     letter-spacing: -0.01em;
     max-width: 30ch;
   }
 
+  /* One rule per card, in the sequence: number, title, chain, status, actions. */
   .proto-meta {
     display: flex;
     align-items: baseline;
     gap: 12px;
-  }
-
-  .proto-number {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: var(--color-ink-muted);
   }
 
   .proto-title {
@@ -35,27 +35,29 @@
     line-height: 1.2;
   }
 
-  /* One rule per card, in the sequence: number, title, chain, status, actions. */
+  /* A prototype's one-line description. Prose about the prototype, so it takes
+   * the caption role — the chain appears in mono where it is structure, in the
+   * evidence model's code block. */
   .proto-chain {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 11px;
-    letter-spacing: 0.02em;
+    line-height: 1.45;
     color: var(--color-ink-muted);
   }
 
+  /* Build state. The type is the chip role verbatim — a state tag is a tag —
+   * and all this adds is the leading dot, so the state reads at a glance
+   * without competing with the card's own actions. Built wears the mint
+   * accent; planned is a neutral ring, because a plan is an outline. */
   .status {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-ink);
   }
 
   .status::before {
     content: '';
+    flex-shrink: 0;
     width: 6px;
     height: 6px;
     border-radius: var(--radius-pill);
@@ -67,7 +69,6 @@
   }
 
   .status-planned::before {
-    /* A planned prototype is an outline, not a solid: a ring, not a fill. */
     background-color: transparent;
     box-shadow: inset 0 0 0 1px var(--color-rule);
   }

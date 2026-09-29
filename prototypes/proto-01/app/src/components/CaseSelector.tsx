@@ -22,7 +22,7 @@ export const CaseSelector = () => {
             name="demo-case"
             value={state.selectedCaseId}
             onChange={(event) => selectCase(event.target.value)}
-            className="ds-select appearance-none rounded-card border border-rule bg-surface py-1.5 pl-3 pr-9 text-[13px] font-medium text-ink transition-colors duration-150 hover:bg-sunken"
+            className="ds-select ds-control appearance-none rounded-card border border-rule bg-surface py-1.5 pl-3 pr-9 text-ink transition-colors duration-150 hover:bg-sunken"
           >
             {DEMO_CASES.map((item, index) => (
               <option key={item.id} value={item.id}>
@@ -48,14 +48,7 @@ export const CaseSelector = () => {
         </div>
       </div>
 
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]"
-        style={{
-          backgroundImage:
-            'linear-gradient(135deg, #FFA07A 0%, #F4A261 35%, #E8A5C8 70%, #A5C4F0 100%)',
-        }}
-      />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 ds-mesh-rule" />
     </header>
   )
 }

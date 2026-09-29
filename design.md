@@ -107,10 +107,23 @@ Roles, mapped onto the three families in section 1:
 | `ds-caption` | Plus Jakarta Sans 400 | `11px` / `1.45` | Supporting notes, source citations |
 | `ds-label` | Space Mono 400 | `10px`, `0.14em` tracking, uppercase | Metadata: entity ids, paragraph ids, axis labels |
 | `ds-chip` | Space Mono 400 | `9px`, `0.12em` tracking, uppercase | Entity-kind and state tags |
+| `ds-control` | Plus Jakarta Sans 500 | `13px` / `1.5` | Buttons, tabs, and any label the user acts on |
 
 * **Serif is for content, sans is for interface, mono is for addressing.**
   A paragraph id is an address, so it is always mono.
 * Body text is never set below 14px, and uppercase mono never below 9px.
+* **`ds-control` exists because a control's text must be measured by the
+  button, not by the page.** Interface body copy is 14px because it sits inside
+  panes competing for attention; a 14px label inside a 32px-tall button reads as
+  too large, because the button is a fixed island and the text is not
+  competing with anything. 13px is that one step down, and it is the only size
+  in the system that appears for no reason other than fitting a control. An
+  action that is not a control — a link in a sentence, a value in a table —
+  stays at `ds-body` regardless of where it sits.
+* A state tag is a `ds-chip` with a leading dot, never a chip fill: a filled
+  chip sits beside a filled button and the two then read as the same kind of
+  thing. Built wears the mint accent, planned a neutral ring, because a plan is
+  an outline.
 
 ### 3.6 Accent usage
 * **Accents are fills, never text.** `--color-ink` on every accent, so contrast
@@ -164,9 +177,13 @@ Roles, mapped onto the three families in section 1:
 * **An `h2` opens a section and is separated from the one above it** by a
   hairline rule and `2.2em` of space. The record is scrolled, not paged, so the
   rule is what tells the reader they have left one section.
-* **Headings are addressable.** Every `h2`–`h4` gets a stable slug id and a
-  hover anchor, so any part of a research record can be cited. A finding that
-  cannot be linked to is a finding that gets paraphrased.
+* **Headings are addressable, but not decorated.** Every `h2`–`h4` gets a
+  stable slug id, so any part of a research record can be cited and a table of
+  contents can point at it. A finding that cannot be linked to is a finding
+  that gets paraphrased. The id is the whole affordance: there is no `#` anchor
+  glyph in the record. An element that is invisible until hover still reserves
+  its width in every heading, so it reads as a stray space at the end of the
+  line — a decoration that shows up as a defect rather than as an invitation.
 * **Tables scroll, they do not reflow.** A wrapped number is a misread number,
   so a wide table gets a horizontal scroll region rather than stacking cells.
   Headers stay mono-uppercase as metadata.
@@ -176,10 +193,27 @@ Roles, mapped onto the three families in section 1:
 * **Accent is reserved.** A blockquote takes a periwinkle left rule, the one
   place a research record uses an accent, so quoted text is visibly not the
   author's own words.
+* **`68ch` is a ceiling, and the grid is what sets the real measure.** A record
+  is a 208px table of contents plus the article, so the container decides how
+  much column is left over. The site is one grid at `max-w-5xl` (1024px, 32px
+  gutters) across the catalog *and* every record, because a header whose left
+  edge moves between pages is the most obvious way for a site to read as two
+  sites. That leaves the article 704px — `64ch` at 15px — against a 48px gap and
+  a table of contents flush to the right edge. `64ch` is comfortably inside the
+  ceiling, and the TOC is never given more than its longest heading needs: at
+  10px mono, "Why evidence must be verbatim" is already 191px, so a narrower
+  column would wrap the very entry a reader is most likely to click. The `68ch`
+  ceiling still does its job on a viewport where the TOC drops below the
+  article, where the column then opens to the full ceiling.
 
 ### 3.10 Gradient use
-* **The header mesh gradient is a 3px rule**, not a fill. Filling the header
-  with it would out-shout the type; a hairline keeps the atmosphere and the calm.
+* **The header mesh gradient is a 3px rule** (`.ds-mesh-rule`), not a fill.
+  Filling the header with it would out-shout the type; a hairline keeps the
+  atmosphere and the calm. It is one role carrying the appearance only — the
+  prototype lays it over a header's lower edge and the site lays it under one,
+  so positioning stays with the caller. It is defined once in `shared/tokens.css`
+  and both surfaces use that, rather than the prototype holding the gradient
+  stops inline and the site restating them.
 * **The bar pill gradient fills the plotted value only.** The remaining track
   stays `--color-sunken`, so the gradient reads as magnitude rather than
   decoration.
