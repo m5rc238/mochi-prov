@@ -14,7 +14,7 @@ const FLASH_PEAK = 'rgba(164, 231, 208, 1)'
 /** Breathing room left between the highlighted span and the edge of the pane. */
 const SCROLL_EDGE = 24
 
-export const SourceDocument = () => {
+export const SourceDocument = ({ footerNote }: { footerNote?: string }) => {
   const { demoCase, resolved, selectEvidence } = useEvidenceSelection()
   const reducedMotion = useReducedMotion()
   const { source } = demoCase
@@ -157,8 +157,8 @@ export const SourceDocument = () => {
         })}
 
         <footer className="ds-caption border-t ds-divider pt-3" style={{ borderTopWidth: 1 }}>
-          End of document. Every highlighted span is quoted from the evidence items listed
-          in the claim panel.
+          {footerNote ??
+            'End of document. Every highlighted span is quoted from the evidence items listed in the claim panel.'}
         </footer>
       </div>
     </section>

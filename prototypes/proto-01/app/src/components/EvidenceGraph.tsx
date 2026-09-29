@@ -15,7 +15,7 @@ const nodeTypes = { provenance: ProvenanceNodeView }
  */
 const MIN_FIT_ZOOM = 0.72
 
-const GraphCanvas = () => {
+const GraphCanvas = ({ onEvidenceFocus }: { onEvidenceFocus?: (evidenceId: string) => void }) => {
   const { demoCase, resolved, selectClaim, selectEvidence } = useEvidenceSelection()
   const reducedMotion = useReducedMotion()
   const { fitView } = useReactFlow()
@@ -35,9 +35,15 @@ const GraphCanvas = () => {
       const { kind, entityId } = node.data
       if (!entityId) return
       if (kind === 'claim') selectClaim(entityId)
-      if (kind === 'evidence') selectEvidence(entityId)
+      if (kind === 'evidence') {
+        selectEvidence(entityId)
+        // Proto 01 has the source document on screen already, so nothing needs to
+        // be revealed. Proto 02 opens the source in a third column and uses this
+        // to reveal it.
+        onEvidenceFocus?.(entityId)
+      }
     },
-    [selectClaim, selectEvidence],
+    [selectClaim, selectEvidence, onEvidenceFocus],
   )
 
   return (
@@ -66,7 +72,7 @@ const GraphCanvas = () => {
   )
 }
 
-export const EvidenceGraph = () => {
+export const EvidenceGraph = ({ onEvidenceFocus }: { onEvidenceFocus?: (evidenceId: string) => void } = {}) => {
   const { resolved } = useEvidenceSelection()
 
   const hint = resolved.evidence
@@ -79,7 +85,7 @@ export const EvidenceGraph = () => {
         {hint}
       </p>
       <ReactFlowProvider>
-        <GraphCanvas />
+        <GraphCanvas onEvidenceFocus={onEvidenceFocus} />
       </ReactFlowProvider>
     </div>
   )

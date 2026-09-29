@@ -12,7 +12,7 @@ const fromRoot = (...parts: string[]) => resolve(here, ...parts)
 
 // The site is a small set of static pages: the research catalog, one
 // documentation page per prototype (plus Proto 01's second record version),
-// the shared evidence model, and the Proto 01 app itself. They are separate
+// the shared evidence model, and the two prototype apps. They are separate
 // documents rather than client-side routes.
 //
 // The list lives in `shared/pages.ts` so the tests can check it; it is resolved

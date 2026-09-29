@@ -21,5 +21,6 @@ export const SITE_PAGES: Record<string, string> = {
    * page rather than a revision of the first, because a research record that is
    * overwritten is a record whose history can no longer be read. */
   proto01DocV2: '/prototypes/proto-01/doc-v2.html',
+  proto02App: '/prototypes/proto-02/app/index.html',
   proto02Doc: '/prototypes/proto-02/doc.html',
 }

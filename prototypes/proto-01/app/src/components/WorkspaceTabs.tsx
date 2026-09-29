@@ -5,12 +5,18 @@ const TABS: { id: WorkspaceTab; label: string; hint: string }[] = [
   { id: 'data', label: 'Data View', hint: 'The same evidence, plotted' },
 ]
 
-export const WorkspaceTabs = () => {
+export const WorkspaceTabs = ({
+  label = 'Center workspace',
+  compact = false,
+}: {
+  label?: string
+  compact?: boolean
+}) => {
   const { activeWorkspaceTab, setTab } = useEvidenceSelection()
 
   return (
     <div className="flex shrink-0 items-end gap-5 border-b ds-divider" style={{ borderBottomWidth: 1 }}>
-      <div role="tablist" aria-label="Center workspace" className="flex items-end gap-5">
+      <div role="tablist" aria-label={label} className="flex items-end gap-5">
         {TABS.map((tab) => {
           const isCurrent = tab.id === activeWorkspaceTab
           return (
@@ -34,9 +40,11 @@ export const WorkspaceTabs = () => {
           )
         })}
       </div>
-      <p className="ds-caption ml-auto pb-2">
-        {TABS.find((tab) => tab.id === activeWorkspaceTab)?.hint}
-      </p>
+      {compact ? null : (
+        <p className="ds-caption ml-auto truncate pb-2">
+          {TABS.find((tab) => tab.id === activeWorkspaceTab)?.hint}
+        </p>
+      )}
     </div>
   )
 }

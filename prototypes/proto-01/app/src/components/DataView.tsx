@@ -213,9 +213,18 @@ const FunnelSeries = ({ series, points, onSelect, onSelectEvidence, isOnPath, ac
   )
 }
 
-export const DataView = () => {
+export const DataView = ({ onPointFocus }: { onPointFocus?: (pointId: string) => void } = {}) => {
   const { demoCase, resolved, selectDataPoint, selectEvidence } = useEvidenceSelection()
   const { dataView } = demoCase
+
+  // Selecting a point is a request to see where the number came from, so the
+  // host is told as well. Proto 01 needs no notification; Proto 02 opens a
+  // source column in response.
+  const onSelectPoint = (pointId: string) => {
+    selectDataPoint(pointId)
+    onPointFocus?.(pointId)
+  }
+
   const onPathPoints = new Set(resolved.pathDataPointIds)
   const activePointId =
     dataView.data.find((point) => point.evidenceIds.includes(resolved.evidence?.id ?? ''))?.id ?? null
@@ -245,7 +254,7 @@ export const DataView = () => {
           const shared = {
             series,
             points,
-            onSelect: selectDataPoint,
+            onSelect: onSelectPoint,
             onSelectEvidence: selectEvidence,
             isOnPath: (point: DataPoint) => onPathPoints.has(point.id),
             activePointId,

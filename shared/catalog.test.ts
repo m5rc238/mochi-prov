@@ -138,9 +138,15 @@ describe('research catalog', () => {
     }
   })
 
-  it('keeps exactly one built prototype, so the index has a real entry point', () => {
+  it('keeps a built prototype, so the index has a real entry point', () => {
+    // This was "exactly one built prototype". That number was never the point:
+    // the point was that the index is not a list of intentions. A second
+    // instrument is a legitimate reason to relax it, and a *smaller* number is
+    // not.
     const built = PROTOTYPES.filter((p) => p.status === 'built')
-    expect(built.length, 'there should be one built prototype').toBe(1)
+    expect(built.length, 'there should be a built prototype to enter').toBeGreaterThan(0)
+    // Proto 01 is where the sequence starts and stays the first thing a reader
+    // enters, whatever is built after it.
     expect(built[0]!.id).toBe('proto-01')
   })
 
@@ -161,6 +167,20 @@ describe('research catalog', () => {
         // A planned prototype must not advertise an app that does not exist.
         expect(proto.appPath, `${proto.id} is planned and should have no app path`).toBeNull()
       }
+    }
+  })
+
+  it('declares every prototype app as a build input, so none is dev-only', () => {
+    // A prototype app missing from `SITE_PAGES` still works under `npm run dev`,
+    // because the dev server serves the project root, and then 404s in the
+    // built site. That is the quietest possible way to ship a dead link.
+    for (const proto of PROTOTYPES) {
+      if (!proto.appPath) continue
+      const entry = proto.appPath.endsWith('/') ? `${proto.appPath}index.html` : proto.appPath
+      expect(
+        Object.values(SITE_PAGES).includes(entry),
+        `${proto.id} app should be declared in SITE_PAGES as ${entry}`,
+      ).toBe(true)
     }
   })
 

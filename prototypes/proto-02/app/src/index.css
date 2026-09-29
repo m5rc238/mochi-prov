@@ -1,0 +1,157 @@
+/* ---------------------------------------------------------------------------
+   Proto 02's own stylesheet.
+
+   Same tokens and type roles as Proto 01, and the same evidence-pane chrome,
+   because the graph and the source document are literally the same components
+   as Proto 01's — only the surrounding conversation is different. What remains
+   here is the chat surface's own layout.
+--------------------------------------------------------------------------- */
+
+@import '../../../../shared/tokens.css';
+@import '../../../../shared/evidence-panes.css';
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    /* The conversation and the evidence columns share one screen rather than
+       one sitting on top of the other, so the page itself must never scroll —
+       only the transcript and whatever each column contains scroll. */
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* --- Dismissing a pane --------------------------------------------------
+     An icon-only square on top of `.action`. The label-shaped padding of
+     `.action` would make a 12px glyph look lost and leave the target oblong, so
+     the box is squared and the glyph centred. The rest of `.action` is kept:
+     same hairline, same hover tint, same radius, because a close control that
+     looks like a different kind of control from every other one is a control
+     people hesitate over. */
+  .pane-close {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    justify-content: center;
+    color: var(--color-ink-muted);
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  .pane-close:hover {
+    color: var(--color-ink);
+    background-color: var(--color-sunken);
+    border-color: var(--color-rule);
+  }
+
+  /* --- Column widths -----------------------------------------------------
+     How much of the screen the evidence panes are allowed to take.
+
+     The panes are the point of the layout, so they get the majority and the
+     conversation takes what is left. The split is not even: the graph is wider
+     of the two because it holds nine labelled nodes and their edges, and
+     because it is the one that resists shrinking. `EvidenceGraph` holds zoom at
+     0.72 so its 14px body copy stays legible, which means a narrow pane does
+     not scale the graph down to fit — it lets the graph overflow and pan
+     instead. Every pixel given to the column is therefore a pixel of legibility
+     or a pixel of panning, and there is no width at which a narrow graph is
+     merely smaller rather than worse.
+
+     The source document is a single column of prose, so it needs less width
+     than the graph but not much less: at the 24vw it started on it was down to
+     ~33 characters per line, which is below a comfortable reading measure for
+     the dense quarterly-review paragraphs it renders.
+
+     The `calc()` caps are the part that matters at small sizes. Three columns
+     on a 1024px screen cannot all have what they want, and the conversation is
+     the one that must not be starved — a narrower column of chat is still a
+     conversation, whereas a cropped graph stops being a graph. So the caps
+     reserve a floor for the chat and let the evidence columns give way instead.
+     Above roughly 1100px the caps stop binding and the `clamp()` shares apply
+     unchanged. */
+  .pane-column-evidence {
+    width: min(clamp(400px, 42vw, 660px), calc(100% - 640px));
+  }
+
+  .pane-column-source {
+    width: min(clamp(280px, 26vw, 420px), calc(100% - 760px));
+  }
+
+  /* --- The composer ------------------------------------------------------
+     A text field would be the real control. Until there is a model behind it,
+     the field is a list of the questions the demo can answer, and it is drawn
+     as a field so the shape participants are being asked to picture is the
+     one they will eventually get. */
+  .chat-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 6px 6px 6px 14px;
+    background-color: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    border-radius: var(--radius-card);
+    transition: border-color 160ms ease;
+  }
+
+  .chat-field:focus-within {
+    border-color: var(--color-rule);
+  }
+
+  /* The select is the field's face, so it must not also draw a border. */
+  .chat-field .ds-select {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    padding-left: 0;
+    background-color: transparent;
+  }
+
+  .chat-field .ds-select:focus {
+    outline: none;
+  }
+
+  /* --- Typing indicator --------------------------------------------------
+     Three dots on a slow cycle. It exists so the answer arrives as a reply
+     rather than appearing the instant a button is pressed. */
+  .chat-pending-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-rule);
+    animation: chat-pending 1.1s ease-in-out infinite;
+  }
+
+  .chat-pending-dot:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+
+  .chat-pending-dot:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+
+  /* The animation is decoration; with reduced motion the dots simply sit
+     there, still legible as "waiting", rather than pulsing. */
+  @media (prefers-reduced-motion: reduce) {
+    .chat-pending-dot {
+      animation: none;
+      opacity: 0.6;
+    }
+  }
+}
+
+@keyframes chat-pending {
+  0%,
+  70%,
+  100% {
+    opacity: 0.35;
+  }
+  35% {
+    opacity: 1;
+  }
+}
