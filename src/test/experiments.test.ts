@@ -380,4 +380,37 @@ describe('experiment workbench', () => {
       expect(s.key).toBeTruthy()
     }
   })
+
+  it('lists the next version’s untested options, and puts the behavioural ones first', () => {
+    const planned = manifest.prototypes.find((p) => p.status === 'planned')!
+    const own = planned.decisions.flatMap((d) => d.solutions.filter((s) => s.status === 'untested'))
+    expect(own.length, 'the next version should have something to try').toBeGreaterThan(0)
+
+    // The page sorts candidates by dimension, behavioural first. Assert the
+    // sort is meaningful rather than a no-op, and that no non-behavioural
+    // question is listed ahead of a behavioural one.
+    const byBehaviour = (d: Decision) => (d.dimension === 'behaviour' ? 0 : 1)
+    const sorted = planned.decisions.slice().sort((a, b) => byBehaviour(a) - byBehaviour(b))
+    const firstNonBehaviour = sorted.findIndex((d) => d.dimension !== 'behaviour')
+    if (firstNonBehaviour !== -1) {
+      expect(
+        sorted.slice(0, firstNonBehaviour).every((d) => d.dimension === 'behaviour'),
+        'behavioural questions should be ordered ahead of everything else',
+      ).toBe(true)
+    }
+  })
+
+  it('keeps the page’s candidate list from falling out of use once a version has decisions', () => {
+    // The candidate block used to render only for a planned version with no
+    // decisions at all, so it silently disappeared as soon as the version it
+    // was meant to guide started declaring questions of its own.
+    expect(
+      indexHtml.includes('proto.status === \'planned\' ? nextCandidates(proto) : []'),
+      'the page should list the planned version’s own untested options, not only inherited ones',
+    ).toBe(true)
+    expect(
+      !/proto\.status === 'planned' && !decisions\.length/.test(html),
+      'the candidate list should not depend on the planned version having zero decisions',
+    ).toBe(true)
+  })
 })

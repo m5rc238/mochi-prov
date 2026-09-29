@@ -47,6 +47,11 @@ be answered by looking at the screen. `proto1` tested 14 decisions, exactly one 
 and none has been put in front of a person. `proto2` exists to close that gap: eight behavioural
 questions, each starting by instrumenting the current build before anything is changed.
 
+Each planned version ends with a **What to try next** list: its own untested options first,
+behavioural questions ahead of everything else, and whatever is still untested in the version it
+inherits from after them and labelled as polish. That ordering is the point — otherwise the 18
+untested options inherited from `proto1` would keep outranking the premise.
+
 The workbench distinguishes **build measurements** (numbers from the running app) from **user
 research** (nothing collected yet), so a layout number is never mistaken for evidence that the
 design works.

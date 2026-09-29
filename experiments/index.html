@@ -1576,27 +1576,43 @@
 
           for (const decision of decisions) card.append(decisionEl(proto, decision))
 
-          // A planned version has nothing to show, so point at the untested
-          // options of the version it inherits from.
-          if (proto.status === 'planned' && !decisions.length) {
+          // A planned version exists to be tried next, so it lists its own
+          // untested options, behavioural questions first. Anything untested
+          // left over in the version it inherits from is listed after them, so
+          // polish work cannot quietly displace a behavioural question.
+          const own = proto.status === 'planned' ? nextCandidates(proto) : []
+          const inherited = proto.status === 'planned' ? nextCandidates(shipped) : []
+          if (own.length || inherited.length) {
             const block = el('div', 'evidence-block')
             const bhead = el('div', 'evidence-head')
             bhead.append(
-              el('h4', null, 'Inherited from ' + shipped.id),
-              el('span', 'kind', 'untested options'),
+              el('h4', null, 'What to try next'),
+              el('span', 'kind', own.length + ' in this version, ' + inherited.length + ' still untested in ' + shipped.id),
             )
             block.append(bhead)
             const bbody = el('div', 'evidence-body')
-            bbody.append(
-              el('p', null, 'This version starts as a copy of ' + shipped.id + '. These options are still untested, and each is a candidate to try next:'),
-            )
-            const cands = el('div', 'candidates')
-            for (const c of nextCandidates(shipped)) {
-              const row = el('div', 'candidate')
-              row.append(el('span', 'id-chip', c.id), chip('untested'), el('span', null, c.solution.summary))
-              cands.append(row)
+            if (own.length) {
+              bbody.append(el('p', null, 'Untested options in this version, behavioural questions first. Each names the measurement it would need before anything is changed.'))
+              const cands = el('div', 'candidates')
+              for (const c of own) {
+                const row = el('div', 'candidate')
+                row.append(el('span', 'id-chip', c.id), chip('untested'), el('span', null, c.solution.summary))
+                cands.append(row)
+              }
+              bbody.append(cands)
             }
-            bbody.append(cands)
+            if (inherited.length) {
+              bbody.append(
+                el('p', null, 'Still untested in ' + shipped.id + '. These are polish and plumbing, not the premise, so they wait behind the behavioural work above.'),
+              )
+              const cands2 = el('div', 'candidates')
+              for (const c of inherited) {
+                const row = el('div', 'candidate')
+                row.append(el('span', 'id-chip', c.id), chip('untested'), el('span', null, c.solution.summary))
+                cands2.append(row)
+              }
+              bbody.append(cands2)
+            }
             block.append(bbody)
             card.append(block)
           }
