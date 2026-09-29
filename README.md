@@ -1,17 +1,15 @@
 # mochi
 
-A desktop-first prototype for tracing an answer back to the text it came from.
+Research into whether making the relationship between an answer's claims and its supporting evidence
+explicit improves human verification of AI-generated answers.
 
-Pick a question, see the answer broken into claims, follow each claim to the
-evidence that supports it, and land on the exact sentence in the source
-document that the evidence quotes. Every pane is a view onto one model, so they
-can never disagree about what is selected.
+This repository is a research catalog. It holds prototypes, the documentation for each one, and the
+record of what has actually been observed about them.
 
-> **All demo data is fictional.** Every question, answer, document, number and
-> quotation in this repository was invented for the prototype. The third case
-> concerns a medical topic and is not clinical evidence, not a finding, and not
-> medical advice — it exists to show the interface handling a sensitive domain
-> honestly. Nothing here calls a model or a network service at runtime.
+> **All demo data is fictional.** Every question, answer, document, number and quotation in this
+> repository was invented for the prototype. The third case concerns a medical topic and is not
+> clinical evidence, not a finding, and not medical advice — it exists to show the interface
+> handling a sensitive domain honestly. Nothing here calls a model or a network service at runtime.
 
 ## Quick start
 
@@ -20,83 +18,109 @@ npm install
 npm run dev
 ```
 
-Then open the URL Vite prints (http://localhost:5173 by default).
-
-## Experiment workbench
-
-[`experiments/index.html`](experiments/index.html) is the record of every version of the prototype and
-what each one was testing. Each version keeps its own prototype link, its own evidence, and its own
-document (`experiments/proto1.md`, one per version).
-
-Versions and decisions both have stable ids, so a change request can be scoped precisely:
-
-| Address | Means |
+| Route | What it is |
 | --- | --- |
-| `proto2` | Start the next version, carrying `proto1` forward as the baseline |
-| `proto1/data-view/trend-line` | Work on one decision in one version |
-| `proto1/data-view/chart-library/chart-js` | Build one specific untested option |
+| `/experiments/` | The research catalog: the question, and every prototype |
+| `/shared/evidence-model.html` | The evidence model, rendered |
+| `/prototypes/proto-01/app/` | Proto 01 — the Evidence Graph, running |
+| `/prototypes/proto-01/doc.html` | Proto 01's research record, rendered |
+| `/prototypes/proto-02/doc.html` | Proto 02's research plan, rendered |
 
-Each option is recorded as a protocol entry: hypothesis, the single variable changed, what was held
-constant, how success would be judged, and the result. Rejected options keep their reason so the
-same idea is not re-proposed.
+`/` redirects to the catalog. The site root is not a page of its own.
 
-Every decision is also tagged with what it is about — `behaviour`, `interaction`, `layout`, `chart`,
-`visual`, `motion`, `architecture` — because a visual question and a behavioural one need different
-evidence. **Behavioural questions get a standing section at the top of the page**, since they cannot
-be answered by looking at the screen. `proto1` tested 14 decisions, exactly one of them behavioural,
-and none has been put in front of a person. `proto2` exists to close that gap: eight behavioural
-questions, each starting by instrumenting the current build before anything is changed.
+## The research question
 
-Each planned version ends with a **What to try next** list: its own untested options first,
-behavioural questions ahead of everything else, and whatever is still untested in the version it
-inherits from after them and labelled as polish. That ordering is the point — otherwise the 18
-untested options inherited from `proto1` would keep outranking the premise.
+> Does making the relationship between an answer's claims and its supporting evidence explicit
+> improve human verification of AI-generated answers?
 
-The workbench distinguishes **build measurements** (numbers from the running app) from **user
-research** (nothing collected yet), so a layout number is never mistaken for evidence that the
-design works.
+The conceptual model under investigation is
+[Question → Answer → Claim → Evidence → Source](shared/evidence-model.md), written out in
+`shared/evidence-model.md`. The point of the model is that a *claim* and the *evidence* for it are
+separate things: a reader who has only seen the answer has seen a claim, and a reader who has seen
+the evidence has seen a reason to believe it or not.
 
-It is a standalone page with no build step:
+## Repository structure
 
-```bash
-open experiments/index.html
+```
+/
+├── index.html                     redirects to the catalog
+├── README.md
+├── design.md                      visual system — the source of truth for type, colour, spacing
+│
+├── experiments/
+│   ├── index.html                 the research catalog
+│   ├── main.ts
+│   └── index.css
+│
+├── prototypes/
+│   ├── doc-page/main.ts           the documentation view, shared by every doc page
+│   ├── proto-01/
+│   │   ├── doc.md                 the research record (source of truth)
+│   │   ├── doc.html               doc.md, rendered
+│   │   └── app/                   the implementation
+│   │       ├── index.html
+│   │       └── src/
+│   └── proto-02/
+│       ├── doc.md                 planned; no implementation yet
+│       └── doc.html
+│
+└── shared/
+    ├── catalog.ts                 prototype metadata — the only place it is written
+    ├── catalog.test.ts            catalog, research-record and renderer tests
+    ├── markdown.ts                the Markdown renderer used by every doc page
+    ├── pages.ts                   every published page, as site-root paths
+    ├── site.css                   shared tokens, type roles, documentation typography
+    ├── evidence-model.md          the model under investigation
+    └── evidence-model.html        evidence-model.md, rendered
 ```
 
-Its embedded manifest is the single source of truth, validated by `src/test/experiments.test.ts`. The
-tests fail the build on a duplicate id, a second shipped option, a missing protocol field, an
-untested option claiming a result, a rejected option without evidence, a stale code reference, a
-behavioural question answered without a person, an addressing rule pointing at something that does
-not exist, or a doc link that does not resolve.
+Each prototype separates its **documentation** from its **implementation**:
 
-## Documents
+```text
+prototype
+├── documentation
+│   └── doc.md
+└── implementation
+    └── app/
+```
 
-Each version has its own document next to the workbench: `experiments/proto1.md` for what the current
-version is, `experiments/proto2.md` for what the next one will test. `design.md` remains the visual
-system and component-level reference.
+## Documentation is the research record
+
+`prototypes/proto-XX/doc.md` is the source of truth for what a prototype is and what has been
+observed about it. The website is a view over those files — `doc.md` is imported as text and rendered
+at build time. **There is no hand-maintained HTML copy of any documentation in this repository**, so
+the two cannot drift apart. Editing a `doc.md` changes the page on the next build.
+
+A section that has not been decided says `Not yet defined.` rather than being filled with a plausible
+guess, and no result is recorded that was not observed. Proto 01 has build measurements and **no user
+research at all**; its `doc.md` says so in as many words, and a test enforces it.
+
+## Prototypes
+
+| # | Title | Status | What it is |
+| --- | --- | --- | --- |
+| [01](prototypes/proto-01/doc.md) | Evidence Graph | Built | `Claim → Evidence → Source`. Three panes over one model, with selection shared between them. |
+| [02](prototypes/proto-02/doc.md) | Provenance you can check | Planned | The behavioural research programme. Eight questions, each starting by instrumenting the current build. |
+
+Proto 01 is the baseline. Its record notes the main thing worth knowing about it: it settled
+thirteen questions about how the interface should look and one about what state it should open in,
+and none of them was settled by watching a person use it. Proto 02 exists to close that gap.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Dev server with hot reload |
-| `npm run build` | Typecheck, then build to `dist/` |
+| `npm run build` | Typecheck, then build every page to `dist/` |
 | `npm run preview` | Serve the production build |
 | `npm test` | Run the test suite once (Vitest) |
 | `npm run typecheck` | `tsc -b`, no emit |
 | `npm run lint` | oxlint |
 
-## The three demo cases
-
-| # | Case | Shows off |
-| --- | --- | --- |
-| 1 | Revenue decline | A claim supported by three pieces of evidence in one paragraph |
-| 2 | Product adoption | A before/after comparison across two measures |
-| 3 | Follow-up and adherence | A sensitive domain, labelled as fictional throughout |
-
-## How it fits together
+## How Proto 01 fits together
 
 ```
-src/
+prototypes/proto-01/app/src/
   model/        the single source of truth
     types.ts      entity types
     cases.ts      the three static cases
@@ -114,40 +138,56 @@ src/
 
 Two ideas carry most of the weight:
 
-**One model, several views.** `src/model/` holds the cases and the selectors
-that resolve a selection against them. The React Flow graph and the Data View
-are both derived from it, so there is no graph-specific copy of the data to fall
-out of sync. The tests assert this as an invariant rather than trusting it.
+**One model, several views.** `model/` holds the cases and the selectors that resolve a selection
+against them. The React Flow graph and the Data View are both derived from it, so there is no
+graph-specific copy of the data to fall out of sync. The tests assert this as an invariant rather
+than trusting it.
 
-**Selection is shared state.** `src/state/selection.ts` holds the selected case,
-claim, evidence and workspace tab. Every pane reads it, so clicking a claim, a
-graph node, a bar or a data point moves all of them at once. Selection cascades
-in one direction — a claim adopts its first evidence, evidence adopts the first
-claim that uses it — which is what keeps a path from becoming inconsistent.
+**Selection is shared state.** `state/selection.ts` holds the selected case, claim, evidence and
+workspace tab. Every pane reads it, so clicking a claim, a graph node, a bar or a data point moves
+all of them at once. Selection cascades in one direction — a claim adopts its first evidence,
+evidence adopts the first claim that uses it — which is what keeps a path from becoming inconsistent.
 
-### Details worth knowing
+Details worth knowing:
 
-- **Evidence is a verbatim substring of its paragraph.** That is what makes the
-  source highlighting exact rather than approximate, and it is checked in tests.
-- **The graph is read-only.** Five node kinds — question, answer, claim, evidence,
-  source — with pan, zoom and fit. No editing, no dragging, no connecting.
-- **Every plotted value is backed by real evidence.** If a number appears in the
-  Data View, an evidence item states it.
-- **The graph has a fit-zoom floor.** Node text is 14px; below `0.72` it stops
-  being legible, so on a narrow pane the graph pans rather than shrinking.
-- **Motion is optional.** GSAP drives case transitions, tab changes and the
-  source reveal. With `prefers-reduced-motion: reduce`, every one of those
-  becomes an instant state change — the behaviour is identical, only the
-  movement is dropped.
+- **Evidence is a verbatim substring of its paragraph.** That is what makes the source highlighting
+  exact rather than approximate, and it is checked in tests.
+- **The graph is read-only.** Five node kinds — question, answer, claim, evidence, source — with pan,
+  zoom and fit. No editing, no dragging, no connecting.
+- **Every plotted value is backed by real evidence.** If a number appears in the Data View, an
+  evidence item states it.
+- **The graph has a fit-zoom floor.** Node text is 14px; below `0.72` it stops being legible, so on a
+  narrow pane the graph pans rather than shrinking.
+- **Motion is optional.** GSAP drives case transitions, tab changes and the source reveal. With
+  `prefers-reduced-motion: reduce`, every one of those becomes an instant state change — the
+  behaviour is identical, only the movement is dropped.
+
+## Tests
+
+`shared/catalog.test.ts` covers the catalog and the research records. It fails the build on a
+duplicate prototype id, a documentation link that does not resolve, an internal doc link that 404s, a
+protocol section that is silently empty, a finding Proto 01 has not earned, or a record that drops
+content on render.
+
+Two of those tests exist because the dev server hides the bug they guard. Vite serves the whole
+project root in development but emits only the pages listed in `build.rollupOptions.input`, so a link
+to `/design.md` answers 200 locally and 404s in the built site. The tests check doc links against the
+set of pages the build actually publishes, and check that every page a reader can reach is declared
+as a build input — so "works in dev, broken in production" fails the suite instead of shipping.
+
+The renderer is tested directly for each construct the docs use — headings with stable ids, tables,
+fenced and inline code, lists including task state, blockquotes, links — and for the two things a
+hand-written renderer gets wrong: it escapes HTML rather than passing it through, and it refuses a
+`javascript:` link target.
 
 ## Design system
 
-`design.md` holds the palette and the typefaces. Its section 3 records the
-decisions made to close the gaps in the original spec — spacing, radii, borders,
-the type scale, interaction states and the rules for when motion is used. Those
-are the rules the code follows; if you change one, change it there first.
+`design.md` holds the palette and the typefaces. Its section 3 records the decisions made to close
+the gaps in the original spec — spacing, radii, borders, the type scale, interaction states, the rules
+for when motion is used, and the typography for longform research records. Those are the rules the
+code follows; if you change one, change it there first.
 
 ## Stack
 
-React 19, TypeScript, Vite, Tailwind CSS v4, React Flow (`@xyflow/react`) and
-GSAP. No backend, no database, no API keys.
+React 19, TypeScript, Vite, Tailwind CSS v4, React Flow (`@xyflow/react`) and GSAP. No backend, no
+database, no API keys, and no Markdown dependency — the renderer is `shared/markdown.ts`.

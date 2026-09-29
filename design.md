@@ -150,7 +150,34 @@ Roles, mapped onto the three families in section 1:
   maxima, so the centre — the pane that has to hold a graph — keeps its width on
   smaller desktops.
 
-### 3.9 Gradient use
+### 3.9 Documentation typography
+* **Longform research records get their own measure and body size.** Interface
+  body text is `14px` because it sits inside panes competing for attention. A
+  research record is read in a column, so it is `15px` at `1.7` with a `68ch`
+  measure. The prototype's `14px` rule is unchanged; this is an additional role,
+  not a replacement.
+* **Serif still means "content".** Document titles and `h2` section headings use
+  Cormorant Garamond; `h3` and below switch to Plus Jakarta Sans, because from
+  `h3` down a heading is labelling a specific thing rather than opening a
+  section. A reader should be able to tell section from subsection with no
+  marker.
+* **An `h2` opens a section and is separated from the one above it** by a
+  hairline rule and `2.2em` of space. The record is scrolled, not paged, so the
+  rule is what tells the reader they have left one section.
+* **Headings are addressable.** Every `h2`–`h4` gets a stable slug id and a
+  hover anchor, so any part of a research record can be cited. A finding that
+  cannot be linked to is a finding that gets paraphrased.
+* **Tables scroll, they do not reflow.** A wrapped number is a misread number,
+  so a wide table gets a horizontal scroll region rather than stacking cells.
+  Headers stay mono-uppercase as metadata.
+* **Lists use a rule, not a disc.** `ul` markers are a 4px hairline, matching
+  the system's flatness; ordered lists stay decimal because order is the
+  information.
+* **Accent is reserved.** A blockquote takes a periwinkle left rule, the one
+  place a research record uses an accent, so quoted text is visibly not the
+  author's own words.
+
+### 3.10 Gradient use
 * **The header mesh gradient is a 3px rule**, not a fill. Filling the header
   with it would out-shout the type; a hairline keeps the atmosphere and the calm.
 * **The bar pill gradient fills the plotted value only.** The remaining track

@@ -1,0 +1,439 @@
+/* ---------------------------------------------------------------------------
+   Documentation — longform research records rendered from Markdown.
+   The tokens are the same ones the prototype uses (see design.md section 3);
+   this file only adds the reading measure a technical document needs. These are
+   reusable roles, not one-off styling for a single page: any research record in
+   this repository renders with them.
+--------------------------------------------------------------------------- */
+
+@import 'tailwindcss';
+
+@theme {
+  /* Surfaces */
+  --color-canvas: #faf7f2;
+  --color-surface: #fffdfa;
+  --color-sunken: #f2ece2;
+
+  /* Ink */
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #6e6e6e;
+  --color-rule: #b5b5b5;
+
+  /* Highlight accents (Palette A) */
+  --color-accent-pink: #f4b8d5;
+  --color-accent-mint: #a4e7d0;
+  --color-accent-peri: #c5cef8;
+
+  /* Indicator status colours (Palette B) */
+  --color-status-scarlet: #ff5a5f;
+  --color-status-orange: #ffb347;
+  --color-status-lavender: #b39ddb;
+  --color-status-sky: #90caf9;
+
+  /* Type */
+  --font-serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'Space Mono', 'SFMono-Regular', Menlo, monospace;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii */
+  --radius-chip: 2px;
+  --radius-card: 4px;
+  --radius-pill: 9999px;
+}
+
+@layer base {
+  html {
+    /* Anchored headings clear the sticky doc header. */
+    scroll-padding-top: 88px;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-ink) 55%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* --- Shared type roles, identical to the prototype's -------------------- */
+  .ds-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  .ds-display {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .ds-body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .ds-caption {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--color-ink-muted);
+  }
+
+  .ds-panel {
+    background-color: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    border-radius: var(--radius-card);
+  }
+
+  .ds-divider {
+    border-color: color-mix(in srgb, var(--color-rule) 60%, transparent);
+  }
+
+  .ds-chip {
+    border-radius: var(--radius-chip);
+    padding: 2px 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  /* --- Site chrome ------------------------------------------------------- */
+  .site-header {
+    background-color: var(--color-canvas);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+  }
+
+  .site-link {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  .site-link:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* The 3px mesh gradient, as a rule. Same use as in the prototype header. */
+  .mesh-rule {
+    height: 3px;
+    background-image: linear-gradient(135deg, #ffa07a 0%, #f4a261 35%, #e8a5c8 70%, #a5c4f0 100%);
+  }
+
+  /* --- Prototype card ------------------------------------------------------ */
+  .proto-card {
+    background-color: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    border-radius: var(--radius-card);
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .proto-card:hover {
+    background-color: var(--color-sunken);
+    border-color: var(--color-rule);
+  }
+
+  .action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 60%, transparent);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .action:hover {
+    background-color: var(--color-sunken);
+    border-color: var(--color-rule);
+  }
+
+  .action-primary {
+    background-color: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  .action-primary:hover {
+    background-color: #000;
+    border-color: #000;
+    color: var(--color-canvas);
+  }
+
+  /* --- Documentation body --------------------------------------------------
+     A reading measure of 68ch. Body copy is sans at 15px rather than the
+     prototype's 14px because this is longform text, not interface copy; serif is
+     reserved for headings and the doc title, so serif still means "content". */
+  .doc {
+    max-width: 68ch;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .doc > * + * {
+    margin-top: 1em;
+  }
+
+  .doc h1 {
+    font-family: var(--font-serif);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 0;
+    margin-bottom: 0.6em;
+  }
+
+  .doc h2 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-top: 2.2em;
+    padding-top: 0.9em;
+    border-top: 1px solid color-mix(in srgb, var(--color-rule) 45%, transparent);
+  }
+
+  .doc h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 1.8em;
+  }
+
+  .doc h4 {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 1.6em;
+  }
+
+  /* A heading is an address, so it is linkable but not decorated. */
+  .doc :is(h2, h3, h4) > a.heading-anchor {
+    color: inherit;
+    text-decoration: none;
+    margin-left: 8px;
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7em;
+    transition: opacity 150ms ease;
+  }
+
+  .doc :is(h2, h3, h4):hover > a.heading-anchor,
+  .doc :is(h2, h3, h4) > a.heading-anchor:focus-visible {
+    opacity: 1;
+  }
+
+  .doc strong {
+    font-weight: 700;
+  }
+
+  .doc a:not(.heading-anchor) {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-rule) 100%, transparent);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .doc a:not(.heading-anchor):hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  .doc ul,
+  .doc ol {
+    padding-left: 1.3em;
+  }
+
+  .doc ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .doc ul > li {
+    position: relative;
+    padding-left: 1.1em;
+  }
+
+  /* A square rather than a disc: quieter, and matches the system's flatness. */
+  .doc ul > li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.72em;
+    width: 4px;
+    height: 1px;
+    background-color: var(--color-rule);
+  }
+
+  .doc ol {
+    list-style: decimal;
+  }
+
+  .doc ol > li {
+    padding-left: 0.3em;
+    margin-top: 0.4em;
+  }
+
+  .doc li > ul,
+  .doc li > ol {
+    margin-top: 0.4em;
+  }
+
+  .doc li.task-item {
+    padding-left: 1.5em;
+  }
+
+  .doc .task-box {
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-chip);
+  }
+
+  .doc .task-box.is-done {
+    background-color: var(--color-accent-mint);
+    border-color: var(--color-accent-mint);
+  }
+
+  .doc blockquote {
+    border-left: 2px solid var(--color-accent-peri);
+    padding-left: 16px;
+    color: var(--color-ink-muted);
+  }
+
+  .doc hr {
+    border: 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-rule) 45%, transparent);
+    margin: 2.4em 0;
+  }
+
+  .doc code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-sunken);
+    color: var(--color-ink);
+  }
+
+  .doc pre {
+    background-color: var(--color-sunken);
+    border: 1px solid color-mix(in srgb, var(--color-rule) 45%, transparent);
+    border-radius: var(--radius-card);
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .doc pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Tables scroll rather than reflow: a research record has columns that must
+     stay aligned to be readable, and a wrapped number is a misread number. */
+  .doc .table-scroll {
+    overflow-x: auto;
+    margin: 1.4em 0;
+  }
+
+  .doc table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .doc th,
+  .doc td {
+    text-align: left;
+    vertical-align: top;
+    padding: 8px 12px 8px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-rule) 45%, transparent);
+  }
+
+  .doc th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    border-bottom-color: var(--color-rule);
+  }
+
+  .doc td + td,
+  .doc th + th {
+    border-left: 1px solid color-mix(in srgb, var(--color-rule) 25%, transparent);
+    padding-left: 12px;
+  }
+
+  /* --- Table of contents --------------------------------------------------- */
+  .toc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .toc a {
+    display: block;
+    padding: 4px 0;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    border-left: 1px solid color-mix(in srgb, var(--color-rule) 45%, transparent);
+    padding-left: 12px;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+
+  .toc a:hover {
+    color: var(--color-ink);
+    border-color: var(--color-rule);
+  }
+
+  .toc a[data-level='3'] {
+    padding-left: 24px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
