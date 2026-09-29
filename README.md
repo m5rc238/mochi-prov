@@ -22,6 +22,22 @@ npm run dev
 
 Then open the URL Vite prints (http://localhost:5173 by default).
 
+## Experiment index
+
+[`experiments/index.html`](experiments/index.html) records every design decision in the prototype and
+every solution considered for it, including the ones that were rejected and why. Each decision has a
+stable id like `data-view/funnel-bars`, so a change request can name exactly one decision or one
+solution (`data-view/funnel-bars/track-fill`).
+
+It is a standalone page with no build step, so open it directly:
+
+```bash
+open experiments/index.html
+```
+
+Its embedded manifest is the single source of truth and is validated by `src/test/experiments.test.ts`,
+so a duplicate id, a missing rationale or a stale code reference fails the test suite.
+
 ## Commands
 
 | Command | What it does |
