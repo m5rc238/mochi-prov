@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest'
 
 import indexHtml from '../../experiments/index.html?raw'
 
-/** The experiment index is a standalone page with no build step, so its manifest
- *  is embedded in the HTML rather than imported. Parsing it here is what keeps
- *  the page honest: a duplicate id, a missing protocol field or a second
- *  "current" solution fails the build instead of quietly misleading. */
-// Read through Vite rather than node:fs so this file needs no node types and
-// stays type-checked under the browser project's compiler options.
+/** The experiment workbench is a standalone page with no build step, so its
+ *  manifest is embedded in the HTML rather than imported. Parsing it here is
+ *  what keeps the page honest: a duplicate id, a missing rationale or a stale
+ *  code reference fails the build instead of quietly misleading a reader. */
 const html = indexHtml
+
+/** Every file a version's doc link can point at. */
+const docs = import.meta.glob('../../experiments/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
 
 /** Every source file in the app, so a target can be checked against reality. */
 const fileKeys = Object.keys(
@@ -26,13 +31,13 @@ const contents = import.meta.glob('../../src/**/*.{ts,tsx}', {
 
 type Solution = {
   key: string
-  status: 'current' | 'alternative' | 'rejected'
+  status: 'shipped' | 'untested' | 'rejected'
   summary: string
   hypothesis?: string
-  varies?: string
-  holds?: string
-  evaluate?: string
-  measured?: string
+  intervention?: string
+  controlled?: string
+  method?: string
+  result?: string
   target?: string
   note?: string
 }
@@ -40,9 +45,23 @@ type Solution = {
 type Decision = {
   id: string
   screen: string
-  open: boolean
-  decision: string
+  question: string
+  open?: boolean
   solutions: Solution[]
+}
+
+type Measurement = { decision: string; before: string; after: string }
+
+type Version = {
+  id: string
+  name: string | null
+  status: 'current' | 'superseded' | 'planned'
+  summary?: string
+  prototypeUrl: string | null
+  doc: string | null
+  userResearch: { status: string; method?: string | null; notes?: string }
+  buildMeasurements: Measurement[]
+  decisions: Decision[]
 }
 
 type Manifest = {
@@ -51,10 +70,13 @@ type Manifest = {
   conventions: {
     prototypeUrl: string
     idPattern: string
-    statuses: Record<string, string>
+    prototypeStatuses: Record<string, string>
+    solutionStatuses: Record<string, string>
+    evidenceKinds: Record<string, string>
+    protocol: { question: string; fields: { name: string; means: string }[] }
     rules: { say: string; means: string }[]
   }
-  experiments: Decision[]
+  prototypes: Version[]
 }
 
 const extract = (): Manifest => {
@@ -66,87 +88,142 @@ const extract = (): Manifest => {
 }
 
 const manifest = extract()
+const shipped = manifest.prototypes.filter((p) => p.status === 'current')
+const planned = manifest.prototypes.filter((p) => p.status === 'planned')
+const allDecisions = manifest.prototypes.flatMap((p) =>
+  p.decisions.map((d) => ({ proto: p, decision: d })),
+)
 
-describe('experiment manifest', () => {
+describe('experiment workbench', () => {
   it('is embedded in the page and parses', () => {
-    expect(manifest.version).toBe(1)
-    expect(manifest.experiments.length).toBeGreaterThan(0)
+    expect(manifest.version).toBe(2)
+    expect(manifest.prototypes.length, 'a workbench with no versions is not a workbench').toBeGreaterThan(0)
   })
 
-  it('uses unique, well-formed decision ids', () => {
-    const ids = manifest.experiments.map((d) => d.id)
-    expect(new Set(ids).size, 'decision ids must be unique').toBe(ids.length)
+  it('names versions uniquely and keeps exactly one current', () => {
+    const ids = manifest.prototypes.map((p) => p.id)
+    expect(new Set(ids).size, 'version ids must be unique').toBe(ids.length)
     for (const id of ids) {
-      expect(id, `id "${id}" should be screen/decision`).toMatch(/^[a-z0-9-]+\/[a-z0-9-]+$/)
-      const [screen, decision] = id.split('/')!
-      expect(decision, `id "${id}" should name a decision`).not.toBe('')
-      expect(screen).not.toBe('')
+      expect(id, `version id "${id}" should look like proto1`).toMatch(/^proto\d+$/)
+    }
+    expect(shipped.length, `exactly one version should be current, found ${shipped.length}`).toBe(1)
+  })
+
+  it('gives every version a name, a summary and a status worth keeping', () => {
+    for (const proto of manifest.prototypes) {
+      expect(manifest.conventions.prototypeStatuses[proto.status], `"${proto.id}" has status "${proto.status}"`).toBeTruthy()
+      expect(proto.summary, `"${proto.id}" should say what this version is`).toBeTruthy()
+      if (proto.status === 'planned') {
+        // A version that does not exist yet must not claim to have run.
+        expect(proto.prototypeUrl, `"${proto.id}" is planned, so it has nothing to link to`).toBeNull()
+        expect(proto.doc, `"${proto.id}" is planned, so it has no doc yet`).toBeNull()
+      } else {
+        expect(proto.name, `"${proto.id}" should be named`).toBeTruthy()
+      }
     }
   })
 
-  it('names exactly one current solution per decision', () => {
-    for (const decision of manifest.experiments) {
-      const current = decision.solutions.filter((s) => s.status === 'current')
+  it('points each built version at a prototype and a doc that exist', () => {
+    for (const proto of manifest.prototypes.filter((p) => p.status !== 'planned')) {
+      expect(proto.prototypeUrl, `"${proto.id}" should link to its prototype`).toMatch(/^https?:\/\//)
+      expect(proto.doc, `"${proto.id}" should link to its doc`).toBeTruthy()
+      const key = Object.keys(docs).find((k) => k.endsWith(proto.doc!.split('/').pop()!))
+      expect(key, `the doc for "${proto.id}" (${proto.doc}) should exist in experiments/`).toBeDefined()
+    }
+  })
+
+  it('uses unique, well-formed decision ids inside each version', () => {
+    for (const proto of manifest.prototypes) {
+      const ids = proto.decisions.map((d) => d.id)
+      expect(new Set(ids).size, `"${proto.id}" has duplicate decision ids`).toBe(ids.length)
+      for (const decision of proto.decisions) {
+        const where = `${proto.id}/${decision.id}`
+        expect(decision.id, `id "${decision.id}" should be screen/decision`).toMatch(/^[a-z0-9-]+\/[a-z0-9-]+$/)
+        expect(decision.screen, `${where} should say which screen it belongs to`).toBeTruthy()
+        expect(decision.question, `${where} should be phrased as a question`).toBeTruthy()
+      }
+    }
+  })
+
+  it('repeats the same decisions in each built version, so results stay comparable', () => {
+    const built = manifest.prototypes.filter((p) => p.status !== 'planned' && p.decisions.length)
+    if (built.length < 2) return
+    const [first, ...rest] = built.map((p) => new Set(p.decisions.map((d) => d.id)))
+    for (const ids of rest) {
+      expect([...ids].sort(), 'every built version should carry the same decision ids').toEqual([...first].sort())
+    }
+  })
+
+  it('names exactly one shipped solution per decision', () => {
+    for (const { proto, decision } of allDecisions) {
+      const built = decision.solutions.filter((s) => s.status === 'shipped')
       expect(
-        current.length,
-        `"${decision.id}" should have exactly one current solution, found ${current.length}`,
+        built.length,
+        `"${proto.id}/${decision.id}" should have exactly one shipped option, found ${built.length}`,
       ).toBe(1)
     }
   })
 
   it('uses unique solution keys within each decision', () => {
-    for (const decision of manifest.experiments) {
+    for (const { proto, decision } of allDecisions) {
       const keys = decision.solutions.map((s) => s.key)
-      expect(new Set(keys).size, `"${decision.id}" has duplicate solution keys`).toBe(keys.length)
+      expect(new Set(keys).size, `"${proto.id}/${decision.id}" has duplicate solution keys`).toBe(keys.length)
     }
   })
 
-  it('records the full protocol for every solution', () => {
-    for (const decision of manifest.experiments) {
-      expect(decision.solutions.length, `"${decision.id}" should list more than one option`).toBeGreaterThan(1)
+  it('records the protocol for every option, and no result for an untested one', () => {
+    const required = ['hypothesis', 'intervention', 'controlled', 'method'] as const
+    for (const { proto, decision } of allDecisions) {
+      expect(decision.solutions.length, `"${proto.id}/${decision.id}" should list more than one option`).toBeGreaterThan(1)
       for (const solution of decision.solutions) {
-        const where = `${decision.id}/${solution.key}`
-        // summary, hypothesis, varies, holds and evaluate are what make an
-        // entry an experiment rather than a note.
+        const where = `${proto.id}/${decision.id}/${solution.key}`
         expect(solution.summary, `${where} needs a summary`).toBeTruthy()
-        expect(solution.hypothesis, `${where} needs a hypothesis`).toBeTruthy()
-        expect(solution.varies, `${where} needs to say what it varies`).toBeTruthy()
-        expect(solution.holds, `${where} needs to say what it holds constant`).toBeTruthy()
-        expect(solution.evaluate, `${where} needs an evaluation method`).toBeTruthy()
-        expect(
-          ['current', 'alternative', 'rejected'],
-          `${where} has an unknown status "${solution.status}"`,
-        ).toContain(solution.status)
+        for (const field of required) {
+          expect(
+            solution[field],
+            `${where} needs a ${field}: ${manifest.conventions.protocol.fields.find((f) => f.name === field)?.means}`,
+          ).toBeTruthy()
+        }
+
+        if (solution.status === 'untested') {
+          // The important one: an option nobody has tried must not carry a
+          // result, or the workbench starts asserting things nobody measured.
+          expect(
+            solution.result,
+            `${where} is untested, so it must not claim a result`,
+          ).toBeFalsy()
+        } else {
+          expect(solution.result, `${where} is ${solution.status}, so it needs the result that got it there`).toBeTruthy()
+        }
       }
     }
   })
 
-  it('explains every rejection with a measurement or a reason', () => {
-    for (const decision of manifest.experiments) {
+  it('explains every rejection with evidence, not just an opinion', () => {
+    for (const { proto, decision } of allDecisions) {
       for (const solution of decision.solutions.filter((s) => s.status === 'rejected')) {
         expect(
-          solution.measured || solution.note,
-          `${decision.id}/${solution.key} is rejected without saying why`,
+          solution.result,
+          `${proto.id}/${decision.id}/${solution.key} was rejected, so the reason and the evidence must be recorded`,
         ).toBeTruthy()
       }
     }
   })
 
-  it('points the current solution at real code', () => {
-    for (const decision of manifest.experiments) {
-      const current = decision.solutions.find((s) => s.status === 'current')!
-      const target = current.target ?? ''
-      expect(target, `"${decision.id}" should record where its current solution lives`).toMatch(
+  it('points every shipped option at real code', () => {
+    for (const { proto, decision } of allDecisions) {
+      const built = decision.solutions.find((s) => s.status === 'shipped')!
+      const target = built.target ?? ''
+      expect(target, `"${proto.id}/${decision.id}" should record where its shipped option lives`).toMatch(
         /^src\/[\w./-]+:\d+$/,
       )
       const [file, line] = target.split(':')
       // import.meta.glob keys are relative to this file, so they carry a
-      // leading "../" and no "src/". Match on the src-relative suffix rather
-      // than assuming an exact prefix.
-      const relative = file.replace(/^src\//, '')
+      // leading "../" and no "src/". Match on the suffix rather than guessing.
+      const relative = file!.replace(/^src\//, '')
       const key = fileKeys.find((k) => k.endsWith(relative))
       expect(key, `"${target}" should name a real source file`).toBeDefined()
-      if (key === undefined || relative.endsWith('.css')) continue
+      if (key === undefined || relative!.endsWith('.css')) continue
       const source = contents[key] ?? ''
       expect(Number(line), `"${target}" should point at a line that exists`).toBeLessThanOrEqual(
         source.split('\n').length,
@@ -154,55 +231,79 @@ describe('experiment manifest', () => {
     }
   })
 
-  it('documents the addressing rules the page teaches', () => {
-    expect(manifest.conventions.idPattern).toBe('screen/decision')
-    for (const status of ['current', 'alternative', 'rejected']) {
-      expect(manifest.conventions.statuses[status], `status "${status}" should be defined`).toBeTruthy()
-    }
-    const says = manifest.conventions.rules.map((r) => r.say)
-    // At least one worked example must show the two-segment form, and at least
-    // one must show how to name a single solution rather than a whole decision.
-    expect(says.some((s) => /\b[a-z0-9-]+\/[a-z0-9-]+/.test(s)), 'no example uses the screen/decision form').toBe(true)
-    expect(says.some((s) => /\b[a-z0-9-]+\/[a-z0-9-]+\/[a-z0-9-]+/.test(s)), 'no example names a single solution').toBe(true)
-    for (const rule of manifest.conventions.rules) {
-      expect(rule.means, `"${rule.say}" should say what it means`).toBeTruthy()
+  it('keeps user research honest about not having been collected', () => {
+    for (const proto of manifest.prototypes) {
+      const r = proto.userResearch
+      expect(manifest.conventions.evidenceKinds['user-session'], 'user sessions should be a known evidence kind').toBeTruthy()
+      if (r.status === 'not-collected') {
+        // No claims, but the method to collect it should be spelled out.
+        expect(r.notes ?? '', `"${proto.id}" has no user research, so it should not assert findings`).toBeFalsy()
+      }
+      if (r.status === 'collected') {
+        expect(r.notes, `"${proto.id}" claims user research, so it needs notes to back that up`).toBeTruthy()
+      }
     }
   })
 
-  it('only teaches rules that address decisions that exist', () => {
-    const ids = new Set(manifest.experiments.map((d) => d.id))
+  it('records build measurements against decisions that exist in that version', () => {
+    for (const proto of manifest.prototypes) {
+      const ids = new Set(proto.decisions.map((d) => d.id))
+      for (const m of proto.buildMeasurements) {
+        expect(ids.has(m.decision), `a measurement in "${proto.id}" points at "${m.decision}", which is not one of its decisions`).toBe(true)
+        expect(m.before, `the measurement for "${m.decision}" should say what it was`).toBeTruthy()
+        expect(m.after, `the measurement for "${m.decision}" should say what it became`).toBeTruthy()
+      }
+    }
+  })
+
+  it('documents the addressing rules the page teaches', () => {
+    expect(manifest.conventions.idPattern).toBe('proto/screen/decision')
+    for (const status of ['shipped', 'untested', 'rejected']) {
+      expect(manifest.conventions.solutionStatuses[status], `status "${status}" should be defined`).toBeTruthy()
+    }
+    for (const field of manifest.conventions.protocol.fields) {
+      expect(field.means, `protocol field "${field.name}" should say what it means`).toBeTruthy()
+    }
+    const says = manifest.conventions.rules.map((r) => r.say)
+    expect(says.some((s) => /proto\d+\/[a-z0-9-]+\/[a-z0-9-]+/.test(s)), 'no example addresses a decision in a version').toBe(true)
+    expect(says.some((s) => /proto\d+\/[a-z0-9-]+\/[a-z0-9-]+\/[a-z0-9-]+/.test(s)), 'no example names a single option').toBe(true)
+  })
+
+  it('only teaches rules that address things which exist', () => {
+    const versionIds = new Set(manifest.prototypes.map((p) => p.id))
+    const decisionIds = new Set(allDecisions.map(({ proto, decision }) => `${proto.id}/${decision.id}`))
     const solutionIds = new Set(
-      manifest.experiments.flatMap((d) => d.solutions.map((s) => `${d.id}/${s.key}`)),
+      allDecisions.flatMap(({ proto, decision }) =>
+        decision.solutions.map((s) => `${proto.id}/${decision.id}/${s.key}`),
+      ),
     )
     for (const rule of manifest.conventions.rules) {
-      // Pull out anything that looks like an id being addressed.
-      for (const mentioned of rule.say.match(/[a-z0-9-]+(?:\/[a-z0-9-]+){1,2}/g) ?? []) {
+      for (const mentioned of rule.say.match(/\bproto\d+(?:\/[a-z0-9-]+){1,2}/g) ?? []) {
         expect(
-          ids.has(mentioned) || solutionIds.has(mentioned),
+          versionIds.has(mentioned) || decisionIds.has(mentioned) || solutionIds.has(mentioned),
           `rule "${rule.say}" addresses "${mentioned}", which is not in the manifest`,
         ).toBe(true)
       }
     }
   })
 
-  it('links the current prototype from the page', () => {
-    const url = manifest.conventions.prototypeUrl
-    expect(url, 'the page needs one url for the built prototype').toBeTruthy()
-    expect(url, 'the prototype link should be absolute').toMatch(/^https?:\/\//)
-    // The header carries the link, and every current solution repeats it, so a
-    // reader can get to the running app from any decision.
-    expect(html, 'the header should link to the prototype').toContain('id="prototype-link"')
-    expect(html, 'current solutions should link to the prototype').toContain('open the current prototype')
-    const currents = manifest.experiments.flatMap((d) => d.solutions.filter((s) => s.status === 'current'))
-    expect(currents, 'the manifest should have current solutions to link from').toHaveLength(
-      manifest.experiments.length,
-    )
+  it('keeps a slot open for the next version', () => {
+    // The workbench is meant to be extended by asking for another version, so
+    // there should always be somewhere to put one.
+    expect(planned.length, 'there should be a planned version to build next').toBeGreaterThan(0)
+    for (const proto of planned) {
+      expect(proto.decisions.length, `"${proto.id}" is planned, so it should carry no results yet`).toBe(0)
+      expect(proto.buildMeasurements.length, `"${proto.id}" is planned, so it should have no measurements yet`).toBe(0)
+    }
   })
 
-  it('covers the screens the product actually ships', () => {
-    const screens = new Set(manifest.experiments.map((d) => d.screen))
-    for (const screen of ['Data View', 'Left pane', 'Graph', 'Shell', 'Design system']) {
-      expect(screens, `no decision recorded for ${screen}`).toContain(screen)
+  it('offers the untested options of the current version as the next things to try', () => {
+    const from = shipped[0]!
+    const untested = from.decisions.flatMap((d) => d.solutions.filter((s) => s.status === 'untested'))
+    expect(untested.length, 'there should be something left to try').toBeGreaterThan(0)
+    // Every inherited candidate has to be addressable by a full id.
+    for (const s of untested) {
+      expect(s.key).toBeTruthy()
     }
   })
 })

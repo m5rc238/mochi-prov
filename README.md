@@ -22,21 +22,36 @@ npm run dev
 
 Then open the URL Vite prints (http://localhost:5173 by default).
 
-## Experiment index
+## Experiment workbench
 
-[`experiments/index.html`](experiments/index.html) records every design decision in the prototype and
-every solution considered for it, including the ones that were rejected and why. Each decision has a
-stable id like `data-view/funnel-bars`, so a change request can name exactly one decision or one
-solution (`data-view/funnel-bars/track-fill`).
+[`experiments/index.html`](experiments/index.html) is the record of every version of the prototype and
+what each one was testing. Each version keeps its own prototype link, its own evidence, and its own
+document (`experiments/proto1.md`, one per version).
 
-It is a standalone page with no build step, so open it directly:
+Versions and decisions both have stable ids, so a change request can be scoped precisely:
+
+| Address | Means |
+| --- | --- |
+| `proto2` | Start the next version, carrying `proto1` forward as the baseline |
+| `proto1/data-view/trend-line` | Work on one decision in one version |
+| `proto1/data-view/chart-library/chart-js` | Build one specific untested option |
+
+Each option is recorded as a protocol entry: hypothesis, the single variable changed, what was held
+constant, how success would be judged, and the result. Rejected options keep their reason so the
+same idea is not re-proposed. The workbench distinguishes **build measurements** (numbers from the
+running app) from **user research** (nothing collected yet), so a layout number is never mistaken for
+evidence that the design works.
+
+It is a standalone page with no build step:
 
 ```bash
 open experiments/index.html
 ```
 
-Its embedded manifest is the single source of truth and is validated by `src/test/experiments.test.ts`,
-so a duplicate id, a missing rationale or a stale code reference fails the test suite.
+Its embedded manifest is the single source of truth, validated by `src/test/experiments.test.ts`. The
+tests fail the build on a duplicate id, a second shipped option, a missing protocol field, an
+untested option claiming a result, a rejected option without evidence, a stale code reference, or an
+addressing rule pointing at something that does not exist.
 
 ## Commands
 

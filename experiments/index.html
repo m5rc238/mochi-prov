@@ -3,16 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>mochi — experiment index</title>
+    <title>mochi &mdash; experiment workbench</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Crect width='26' height='26' rx='5' fill='%23faf7f2'/%3E%3Cellipse cx='13' cy='13.5' rx='9.5' ry='8.75' fill='%23a4e7d0'/%3E%3Ccircle cx='9.75' cy='13' r='3' fill='%23f4b8d5'/%3E%3Ccircle cx='16.5' cy='16.25' r='1.6' fill='%23c5cef8'/%3E%3C/svg%3E"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
     />
     <style>
       :root {
@@ -31,6 +25,7 @@
         --font-serif: 'Cormorant Garamond', Georgia, serif;
         --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
         --font-mono: 'Space Mono', ui-monospace, monospace;
+        --hairline: color-mix(in srgb, var(--rule) 60%, transparent);
       }
 
       * { box-sizing: border-box; }
@@ -46,30 +41,10 @@
 
       .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
 
-      h1 {
-        font-family: var(--font-serif);
-        font-size: 40px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        line-height: 1.1;
-        margin: 0;
-      }
-
-      h2 {
-        font-family: var(--font-serif);
-        font-size: 24px;
-        font-weight: 600;
-        line-height: 1.2;
-        margin: 0;
-      }
-
-      h3 {
-        font-family: var(--font-serif);
-        font-size: 19px;
-        font-weight: 600;
-        line-height: 1.25;
-        margin: 0;
-      }
+      h1 { font-family: var(--font-serif); font-size: 40px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; margin: 0; }
+      h2 { font-family: var(--font-serif); font-size: 24px; font-weight: 600; line-height: 1.2; margin: 0; }
+      h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 600; line-height: 1.25; margin: 0; }
+      h4 { font-family: var(--font-serif); font-size: 16px; font-weight: 600; margin: 0; }
 
       .lede { max-width: 68ch; color: var(--ink-muted); margin: 12px 0 0; }
       .mono { font-family: var(--font-mono); }
@@ -84,166 +59,189 @@
       }
 
       .topbar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
-        margin-bottom: 32px;
+        display: flex; align-items: center; gap: 12px;
+        padding-bottom: 20px; border-bottom: 1px solid var(--hairline); margin-bottom: 32px;
       }
 
       .panel {
         background: var(--surface);
-        border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
+        border: 1px solid var(--hairline);
         border-radius: var(--radius-card);
       }
 
       .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-family: var(--font-mono);
-        font-size: 10px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 3px 8px;
-        border-radius: var(--radius-chip);
-        border: 1px solid transparent;
-        white-space: nowrap;
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+        text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-chip);
+        border: 1px solid transparent; white-space: nowrap;
       }
 
-      .chip-current  { background: var(--mint); color: var(--ink); border-color: var(--ink); font-weight: 700; }
-      .chip-open    { background: var(--butter); color: var(--ink); }
-      .chip-alternative { background: var(--periwinkle); color: var(--ink); }
+      .chip-shipped  { background: var(--mint); color: var(--ink); border-color: var(--ink); font-weight: 700; }
+      .chip-untested { background: var(--periwinkle); color: var(--ink); }
       .chip-rejected { background: var(--sunken); color: var(--ink-muted); text-decoration: line-through; }
+      .chip-current  { background: var(--ink); color: var(--surface); }
+      .chip-superseded { background: var(--butter); color: var(--ink); }
+      .chip-planned  { background: transparent; color: var(--ink-muted); border-color: var(--rule); border-style: dashed; }
+      .chip-open     { background: var(--butter); color: var(--ink); }
 
       .id-chip {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        background: var(--sunken);
-        border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
-        border-radius: var(--radius-chip);
-        padding: 2px 6px;
-        color: var(--ink);
+        font-family: var(--font-mono); font-size: 12px; background: var(--sunken);
+        border: 1px solid var(--hairline); border-radius: var(--radius-chip);
+        padding: 2px 6px; color: var(--ink);
       }
 
       section { margin-top: 40px; }
 
       .rule-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-
-      .rule {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 8px 12px;
-        padding: 12px 16px;
-      }
-
+      .rule { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; padding: 12px 16px; }
       .rule .say { font-family: var(--font-mono); font-size: 13px; }
       .rule .means { color: var(--ink-muted); font-size: 13px; }
 
-      .toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin: 28px 0 8px;
-      }
+      .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 28px 0 8px; }
 
       input[type='search'] {
-        font-family: var(--font-sans);
-        font-size: 13px;
-        padding: 7px 10px;
-        min-width: 260px;
-        border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
-        border-radius: var(--radius-chip);
-        background: var(--surface);
-        color: var(--ink);
+        font-family: var(--font-sans); font-size: 13px; padding: 7px 10px; min-width: 250px;
+        border: 1px solid var(--hairline); border-radius: var(--radius-chip);
+        background: var(--surface); color: var(--ink);
       }
-
       input[type='search']:focus-visible { outline: 2px solid color-mix(in srgb, var(--ink) 55%, transparent); outline-offset: 2px; }
 
       .filter {
-        font-family: var(--font-mono);
-        font-size: 10px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 7px 10px;
-        background: var(--surface);
-        color: var(--ink-muted);
-        border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
-        border-radius: var(--radius-chip);
-        cursor: pointer;
+        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+        padding: 7px 10px; background: var(--surface); color: var(--ink-muted);
+        border: 1px solid var(--hairline); border-radius: var(--radius-chip); cursor: pointer;
       }
-
       .filter[aria-pressed='true'] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+      .filter[disabled] { opacity: 0.4; cursor: default; }
 
       .count { color: var(--ink-muted); font-size: 12px; }
 
       .cta {
-        margin-left: auto;
-        flex-shrink: 0;
-        padding: 7px 13px;
-        border: 1px solid var(--ink);
-        border-radius: 7px;
-        background: var(--ink);
-        color: var(--surface);
-        font-size: 13px;
-        font-weight: 500;
-        text-decoration: none;
-        white-space: nowrap;
+        margin-left: auto; flex-shrink: 0; padding: 7px 13px;
+        border: 1px solid var(--ink); border-radius: 7px; background: var(--ink); color: var(--surface);
+        font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap;
+      }
+      .cta:hover { opacity: 0.88; }
+      .cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+      /* --- prototype card ------------------------------------------------- */
+      .proto { margin-top: 20px; padding: 22px; }
+
+      .proto-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+      .proto-head .id-chip { margin-left: auto; }
+      .proto-head h3 { font-size: 24px; }
+      .proto .summary { margin: 10px 0 0; max-width: 68ch; }
+
+      .proto-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+
+      .link-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+        padding: 6px 11px; border: 1px solid var(--ink); border-radius: var(--radius-chip);
+        color: var(--ink); text-decoration: none; background: var(--surface);
+      }
+      .link-btn.solid { background: var(--ink); color: var(--surface); }
+      .link-btn:hover { background: var(--mint); color: var(--ink); border-color: var(--ink); }
+      .link-btn[aria-disabled='true'] { opacity: 0.35; pointer-events: none; }
+
+      /* --- evidence ------------------------------------------------------- */
+      .evidence { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+
+      .evidence-block { border: 1px solid var(--hairline); border-radius: var(--radius-card); background: var(--surface); }
+      .evidence-head {
+        display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+        padding: 11px 14px; border-bottom: 1px solid var(--hairline);
+      }
+      .evidence-head h4 { margin: 0; }
+      .evidence-body { padding: 13px 14px; font-size: 13px; }
+      .evidence-body p { margin: 0; }
+      .evidence-body p + p { margin-top: 8px; }
+
+      .kind { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+      .kind-def { color: var(--ink-muted); font-size: 12px; margin: 8px 0 0; max-width: 70ch; }
+
+      .not-collected { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+      .not-collected .flag {
+        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+        padding: 3px 8px; border: 1px dashed var(--ink); border-radius: var(--radius-chip);
       }
 
-      .cta:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
-      .cta:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+      table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      th {
+        font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--ink-muted); text-align: left; font-weight: 400;
+        padding: 0 10px 7px 0; border-bottom: 1px solid var(--hairline);
+      }
+      td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+      tr:last-child td { border-bottom: 0; }
+      td.was { color: var(--ink-muted); }
+      td.now { font-weight: 500; }
 
-      .open-app { font-size: 12px; }
-      .open-app:hover { color: var(--accent-ink); }
+      /* --- decisions ------------------------------------------------------ */
+      .decisions-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 26px; }
 
-      .screen { margin-top: 28px; }
+      .decision {
+        border: 1px solid var(--hairline); border-radius: var(--radius-card);
+        background: var(--surface); margin-top: 8px;
+      }
+      .decision > summary {
+        display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;
+        padding: 12px 14px; cursor: pointer; list-style: none;
+      }
+      .decision > summary::-webkit-details-marker { display: none; }
+      .decision > summary::before {
+        content: '\25B8'; font-size: 11px; color: var(--ink-muted); transition: transform 120ms ease;
+      }
+      .decision[open] > summary::before { transform: rotate(90deg); }
+      .decision > summary:hover { background: var(--sunken); }
+      .decision > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+      .decision > summary .id-chip { margin-left: auto; }
+      .decision[hidden] { display: none; }
 
-      .decision { margin-top: 12px; padding: 16px; }
+      .tally { display: inline-flex; gap: 5px; }
+      .tally .chip { padding: 2px 6px; font-size: 9px; }
 
-      .decision-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
-      .decision-head .id-chip { margin-left: auto; }
+      .decision-body { padding: 0 14px 14px 32px; }
+      .decision-body .question { margin: 0 0 4px; font-weight: 500; }
 
-      .decision p { margin: 8px 0 0; }
-
-      .solutions { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+      .solutions { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 
       .solution {
-        display: flex;
-        gap: 12px;
-        padding: 12px 14px;
-        background: var(--sunken);
-        border-radius: var(--radius-card);
-        border-left: 3px solid transparent;
+        display: flex; gap: 12px; padding: 12px 14px; background: var(--sunken);
+        border-radius: var(--radius-card); border-left: 3px solid transparent;
       }
-
-      .solution[data-status='current'] { border-left-color: var(--mint); background: color-mix(in srgb, var(--mint) 16%, var(--surface)); }
-      .solution[data-status='alternative'] { border-left-color: var(--periwinkle); }
+      .solution[data-status='shipped']  { border-left-color: var(--mint); background: color-mix(in srgb, var(--mint) 16%, var(--surface)); }
+      .solution[data-status='untested'] { border-left-color: var(--periwinkle); }
       .solution[data-status='rejected'] { border-left-color: var(--rule); }
 
       .solution-body { min-width: 0; flex: 1; }
       .solution-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
       .solution-key { font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); }
 
-      dl { margin: 10px 0 0; display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 3px 12px; }
+      dl { margin: 10px 0 0; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 3px 12px; }
       dt {
-        font-family: var(--font-mono);
-        font-size: 9px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--ink-muted);
-        padding-top: 3px;
+        font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--ink-muted); padding-top: 3px;
       }
       dd { margin: 0; font-size: 13px; }
-      dd.measured { font-family: var(--font-mono); font-size: 12px; }
+      dd.result { font-family: var(--font-mono); font-size: 12px; }
       dd a { color: inherit; }
+
+      /* --- next-version candidates ---------------------------------------- */
+      .candidates { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+      .candidate {
+        display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 10px;
+        padding: 10px 12px; border: 1px dashed var(--rule); border-radius: var(--radius-card);
+      }
+      .candidate .id-chip { background: var(--surface); }
 
       .empty { padding: 24px; text-align: center; color: var(--ink-muted); }
 
-      footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid color-mix(in srgb, var(--rule) 60%, transparent); color: var(--ink-muted); font-size: 12px; }
+      footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--hairline); color: var(--ink-muted); font-size: 12px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .decision > summary::before { transition: none; }
+      }
     </style>
   </head>
   <body>
@@ -254,37 +252,46 @@
           <circle cx="9.75" cy="13" r="3" fill="#f4b8d5" />
           <circle cx="16.5" cy="16.25" r="1.6" fill="#c5cef8" />
         </svg>
-        <h1 style="font-size: 26px">mochi &mdash; experiment index</h1>
-        <a class="cta" id="prototype-link" href="http://localhost:5173/">
-          Open the current prototype
-        </a>
+        <h1 style="font-size: 26px">mochi &mdash; experiment workbench</h1>
+        <a class="cta" id="current-link" href="http://localhost:5173/">Open the current prototype</a>
       </div>
 
       <p class="lede">
-        Every design decision in this prototype, and every solution considered for it. One decision is
-        <strong>current</strong>; the rest are <strong>alternatives</strong> waiting to be tried, or
-        <strong>rejected</strong> with the reason and the measurement that rejected them. Nothing here is
-        hidden: a rejected option stays listed so the same idea is not re-proposed later.
+        Every version of the prototype, and the record of what each one was testing. Each version keeps
+        its own link, its evidence, and its own document. Decisions carry a stable id, so a new version
+        is a new set of results against the same questions rather than a fresh page that quietly
+        discards what came before.
+      </p>
+      <p class="lede">
+        Nothing here is hidden. A rejected option stays listed with the reason it was rejected, and a
+        version that is superseded stays readable so the two can be compared. Where there is no
+        evidence yet, the field says so rather than filling the gap.
       </p>
 
       <section>
         <h2>How to direct me</h2>
         <p class="lede">
-          Address a decision by its id and I will act on that decision and nothing else. Ids are
-          <span class="mono">screen/decision</span>. Append a solution key to be precise about which
-          option you mean.
+          Versions and decisions both have ids. A version is <span class="mono">proto1</span>; a decision
+          inside it is <span class="mono">proto1/data-view/trend-line</span>. Append a solution key to name
+          one option rather than the whole decision.
         </p>
         <div class="rule-grid" id="rules"></div>
       </section>
 
       <section>
-        <h2>Decisions</h2>
+        <h2>The protocol</h2>
+        <p class="lede" id="protocol-question"></p>
+        <div class="rule-grid" id="protocol"></div>
+      </section>
+
+      <section>
+        <h2>Versions</h2>
         <div class="toolbar">
-          <input type="search" id="q" placeholder="Filter by id, decision or solution&hellip;" aria-label="Filter decisions" />
+          <input type="search" id="q" placeholder="Filter by version, decision or solution&hellip;" aria-label="Filter versions" />
           <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
-          <button class="filter" type="button" data-filter="open" aria-pressed="false">Open</button>
-          <button class="filter" type="button" data-filter="current" aria-pressed="false">Has current</button>
-          <button class="filter" type="button" data-filter="rejected" aria-pressed="false">Has rejected</button>
+          <button class="filter" type="button" data-filter="current" aria-pressed="false">Current</button>
+          <button class="filter" type="button" data-filter="planned" aria-pressed="false">Planned</button>
+          <button class="filter" type="button" data-expand="all">Expand all</button>
           <span class="count" id="count"></span>
         </div>
         <div id="index"></div>
@@ -296,553 +303,630 @@
     </div>
 
     <script type="application/json" id="experiment-manifest">
-    {
-      "version": 1,
-      "product": "mochi provenance explorer",
-      "updated": "2026-09-28",
-      "conventions": {
-        "prototypeUrl": "http://localhost:5173/",
-        "idPattern": "screen/decision",
-        "statuses": {
-          "current": "Built and live in the app.",
-          "alternative": "Viable, named, not built. The next thing to try if the current one disappoints.",
-          "rejected": "Tried or considered and ruled out. Kept with the reason so it is not re-proposed."
+      {
+        "version": 2,
+        "product": "mochi provenance explorer",
+        "updated": "2026-09-28",
+        "conventions": {
+          "idPattern": "proto/screen/decision",
+          "prototypeUrl": "http://localhost:5173/",
+          "prototypeStatuses": {
+            "current": "The version the app is running right now.",
+            "superseded": "Shipped once, replaced by a later version. Kept so its results stay comparable.",
+            "planned": "Named, not yet built."
+          },
+          "solutionStatuses": {
+            "shipped": "Built and running in this version. Exactly one per decision.",
+            "rejected": "Evaluated and turned down. The reason and the evidence are recorded so the same idea is not re-proposed.",
+            "untested": "Proposed and not yet evaluated. The default state for anything not shipped."
+          },
+          "evidenceKinds": {
+            "build-measurement": "A number or observation taken from the running app or the DOM. Objective, but it only covers what was measured.",
+            "user-session": "An observation from watching or asking a real person. No sessions have been run yet."
+          },
+          "protocol": {
+            "question": "What this version is trying to answer. One per decision, and the same question reappears in every version so results stay comparable.",
+            "fields": [
+              {
+                "name": "hypothesis",
+                "means": "If this version adopted the option, we expect this. Written before the result is known."
+              },
+              {
+                "name": "intervention",
+                "means": "The single variable this option changes. One, so the result is attributable."
+              },
+              {
+                "name": "controlled",
+                "means": "What was deliberately held constant, so a difference in result is not just a different design."
+              },
+              {
+                "name": "method",
+                "means": "How we would know whether it worked, fixed before looking."
+              },
+              {
+                "name": "result",
+                "means": "What actually happened, with the evidence that produced it. Empty means untested, not unknown-because-forgotten."
+              }
+            ]
+          },
+          "rules": [
+            {
+              "say": "build proto2",
+              "means": "Start the next version. Carry proto1 forward as the baseline and change only what the next version is testing."
+            },
+            {
+              "say": "improve proto1/data-view/trend-line",
+              "means": "Work on that one decision in that version. Do not touch any other decision."
+            },
+            {
+              "say": "try proto1/data-view/chart-library/chart-js",
+              "means": "Build that specific untested solution and record the result against the same protocol, so it can be compared like for like."
+            },
+            {
+              "say": "why proto1/design/palette/palette-a-editorial",
+              "means": "Show the evidence behind a shipped solution, including which kind of evidence it is and what it does not cover."
+            },
+            {
+              "say": "supersede proto1 with proto2",
+              "means": "Mark proto1 superseded, not deleted. Its results stay readable so the two versions can be compared."
+            }
+          ]
         },
-        "rules": [
+        "prototypes": [
           {
-            "say": "improve data-view/funnel-bars",
-            "means": "Work only on that decision. Do not touch any other screen, and do not change other decisions."
+            "id": "proto1",
+            "name": "three-pane provenance explorer",
+            "status": "current",
+            "summary": "Three cases, three panes, one shared selection. The first version, and the baseline every later version is measured against.",
+            "prototypeUrl": "http://localhost:5173/",
+            "doc": "proto1.md",
+            "userResearch": {
+              "status": "not-collected",
+              "method": "Five task-based sessions on the three cases. Watch for whether people find the provenance path unprompted, where they stop to verify, and what they do when the chart and the source disagree."
+            },
+            "buildMeasurements": [
+              {
+                "decision": "data-view/trend-line",
+                "before": "SVG rendered 116px wide inside a 603px plot, with the line offset by up to 406px.",
+                "after": "SVG matches the plot width exactly."
+              },
+              {
+                "decision": "data-view/funnel-bars",
+                "before": "Series overflowed the card edge.",
+                "after": "All five series sit inside the card, across all three cases."
+              },
+              {
+                "decision": "left-pane/heading-spacing",
+                "before": "0px between a section heading and its content.",
+                "after": "4px, with the Evidence block internal spacing held at 8px."
+              },
+              {
+                "decision": "state/initial-selection",
+                "before": "Data View opened on a selection that did not match the case default.",
+                "after": "Initial state derives from defaultSelectionFor."
+              }
+            ],
+            "decisions": [
+              {
+                "id": "data-view/funnel-bars",
+                "screen": "Data View",
+                "question": "How is a funnel bar sized so it can never escape its card?",
+                "solutions": [
+                  {
+                    "key": "track-fill",
+                    "status": "shipped",
+                    "summary": "Fill inside a flexible track that absorbs the free space.",
+                    "hypothesis": "If the percentage resolves against a track rather than the whole row, 100% fills the track exactly and can never overflow.",
+                    "intervention": "An extra flex track wraps the bar; the fill is a block child sized as a percentage of the track.",
+                    "controlled": "78px label, 56px value, 12px gaps, pill radius, 24px bar height, evidence chips on the right.",
+                    "method": "Measure the fill's right edge against the card's inner content edge at 1280 and 1512 wide. Pass when no descendant of any series figure crosses that edge.",
+                    "result": "Card inner right edge 928.4. Track 400px on both rows. Fills 400px (100%) and 200px (50%). Widest descendant right edge 887.2. No overflow in any of the five series across three cases.",
+                    "target": "src/components/DataView.tsx:192"
+                  },
+                  {
+                    "key": "direct-percentage",
+                    "status": "rejected",
+                    "summary": "width: N% straight on the bar as a flex item.",
+                    "hypothesis": "The fixed label and value columns are small enough that the percentage can simply be taken against the row.",
+                    "intervention": "No wrapper. The bar carries the percentage itself.",
+                    "controlled": "Same label, value, gap and chip sizes.",
+                    "method": "Check whether the bar's percentage is measured against the row rather than the space left by its siblings.",
+                    "result": "A percentage on a flex item resolves against the containing block, so 100% asked for the full row width plus the 78px label, 56px value and two 12px gaps. Bar right edge landed at 977.2 against a card inner edge of 928.4. Only the 100% row overflowed, which is why it looked intermittent."
+                  },
+                  {
+                    "key": "fixed-columns",
+                    "status": "untested",
+                    "summary": "Fixed-width columns for label, bar and value.",
+                    "hypothesis": "If the value is always the last digit count, the bar does not need to flex at all.",
+                    "intervention": "Bar track becomes a fixed pixel width; the fill is a percentage of it.",
+                    "controlled": "Label and value typography, chips.",
+                    "method": "Check the series still reads correctly at 1024 wide, where a fixed track leaves dead space."
+                  },
+                  {
+                    "key": "chart-js",
+                    "status": "untested",
+                    "summary": "Draw the funnel with Chart.js instead of markup.",
+                    "hypothesis": "A real chart library handles sizing, axes and tooltips correctly by construction.",
+                    "intervention": "Canvas rendering replaces the HTML row.",
+                    "controlled": "Palette, 4px spacing scale, on-path emphasis, click-to-select behaviour.",
+                    "method": "Confirm per-point focusability and screen-reader labels survive, and that the series still fits at 1024 wide.",
+                    "note": "Sizing was never the reason the bar overflowed, so a library would not have caught the original bug. Worth it only for the axes and tooltips, not for the layout."
+                  }
+                ]
+              },
+              {
+                "id": "data-view/bar-emphasis",
+                "screen": "Data View",
+                "question": "How does a bar show that it is not backed by the selected claim?",
+                "solutions": [
+                  {
+                    "key": "gradient-at-45",
+                    "status": "shipped",
+                    "summary": "Same brand gradient, 45% opacity. Value labels stay at full strength.",
+                    "hypothesis": "Emphasis can be carried by opacity alone, so a recessive series still reads as part of the same chart.",
+                    "intervention": "Fill opacity 1 on path, 0.45 off path. Nothing else changes.",
+                    "controlled": "Gradient, bar geometry, label size and colour.",
+                    "method": "With a claim selected, every bar must still carry the gradient and its label must be readable. Count bars without the gradient; it must be zero.",
+                    "result": "Zero bars without the gradient in all five series. Off-path rows in case 2 sit at opacity 0.45 and remain legible.",
+                    "target": "src/components/DataView.tsx:11"
+                  },
+                  {
+                    "key": "flat-grey",
+                    "status": "rejected",
+                    "summary": "Off-path bars drop to a grey fill at 45% opacity.",
+                    "hypothesis": "A neutral fill reads as clearly inactive without needing a second brand colour.",
+                    "intervention": "Off-path bars take a grey derived from the rule colour instead of the gradient.",
+                    "controlled": "Everything else.",
+                    "method": "Does the series still read as a chart when nothing is emphasised?",
+                    "result": "No. On load, with the empty-path bug present, all four bars rendered grey and the pane read as unstyled rather than as a chart. Contributed directly to the report that the Data View was broken."
+                  },
+                  {
+                    "key": "outline-only",
+                    "status": "untested",
+                    "summary": "Off-path bars keep full colour but gain a dashed outline.",
+                    "hypothesis": "Emphasis belongs in the border, not the fill, so colour stays truthful to the value.",
+                    "intervention": "Off-path bars get a dashed hairline; opacity stays at 1.",
+                    "controlled": "Gradient, geometry.",
+                    "method": "Check the dashed outline is still distinguishable at 1024 wide where bars are short."
+                  },
+                  {
+                    "key": "no-de-emphasis",
+                    "status": "untested",
+                    "summary": "All bars at full strength; selection shown only in the source pane and graph.",
+                    "hypothesis": "The Data View is a chart, not a provenance view, and should not encode selection at all.",
+                    "intervention": "Removes the emphasis encoding entirely.",
+                    "controlled": "Click-to-select still selects.",
+                    "method": "Confirm the pane still feels connected to the claim when only the source reacts. This is a real design disagreement worth settling deliberately, not by default."
+                  }
+                ]
+              },
+              {
+                "id": "data-view/trend-line",
+                "screen": "Data View",
+                "question": "How is the trend polyline positioned across its plot?",
+                "solutions": [
+                  {
+                    "key": "explicit-width",
+                    "status": "shipped",
+                    "summary": "Width set to 100% alongside the explicit height, with preserveAspectRatio=none.",
+                    "hypothesis": "Stating the width removes the aspect-ratio fallback that inset-x-0 cannot override.",
+                    "intervention": "Adds width: 100% to the inline style.",
+                    "controlled": "viewBox 0 0 100 100, non-scaling stroke, 116px plot height, dot positions.",
+                    "method": "Compare the SVG's rendered width to the plot row's width, and the line's mapped points to the dot centres. Pass when the offset is under 1px on every point.",
+                    "result": "SVG width 603.2 equals the plot row width 603.2. Worst line-to-dot offset 0.0px on all three points.",
+                    "target": "src/components/DataView.tsx:139"
+                  },
+                  {
+                    "key": "height-implies-width",
+                    "status": "rejected",
+                    "summary": "Only a height is set; the square viewBox is expected to stretch it.",
+                    "hypothesis": "An absolutely positioned box with left and right set will fill its containing block.",
+                    "intervention": "Inline style carries height only.",
+                    "controlled": "Same viewBox and plot height.",
+                    "method": "Measure the SVG's rendered width against the plot row width.",
+                    "result": "The square viewBox made the SVG 116 by 116 for a 603px row, and inset-x-0 did not override it. The x-range was crushed into the left fifth: line-to-dot dx of -81, -244 and -406px, while dy stayed at 0.0 because the vertical mapping was already correct."
+                  },
+                  {
+                    "key": "chart-lib-with-axes",
+                    "status": "untested",
+                    "summary": "Replace the hand-rolled SVG with a chart that supplies a y-axis and gridlines.",
+                    "hypothesis": "Three points with no axis is the weakest part of the pane, and a library is the fastest route to an axis.",
+                    "intervention": "Chart rendering replaces the inline SVG; bars may follow.",
+                    "controlled": "Palette, on-path emphasis, point-to-evidence mapping.",
+                    "method": "Decide whether the pane is still mostly a chart or mostly a provenance index before choosing a library."
+                  }
+                ]
+              },
+              {
+                "id": "data-view/value-label",
+                "screen": "Data View",
+                "question": "Where does the value label sit when its bar reaches the top of the plot?",
+                "solutions": [
+                  {
+                    "key": "flip-inside",
+                    "status": "shipped",
+                    "summary": "Above the bar, or inside its top when the bar reaches the ceiling.",
+                    "hypothesis": "A single conditional keeps the label off the bar in the common case and legible in the extreme case.",
+                    "intervention": "If the bar top is within 13px of the plot ceiling, the label moves inside the bar by 3px.",
+                    "controlled": "10px mono, ink colour, horizontal centring, periwinkle gradient underneath.",
+                    "method": "Check contrast of ink on the light gradient when the label is inside, and that the label never leaves the plot box.",
+                    "result": "Ink on the pastel gradient stays well above contrast minimum; the label sits 7-17px inside a 0-116px plot.",
+                    "target": "src/components/DataView.tsx:86"
+                  },
+                  {
+                    "key": "clamp-above",
+                    "status": "rejected",
+                    "summary": "Always above the bar, clamped to the plot's top edge.",
+                    "hypothesis": "One rule is simpler than a conditional.",
+                    "intervention": "Label top is max(1, barTop - 13).",
+                    "controlled": "Label size and colour.",
+                    "method": "Check whether a full-height bar's label overlaps its own fill.",
+                    "result": "It did. At full height the bar top is 0, the clamp put the label at 1px, and the number landed on the bar."
+                  },
+                  {
+                    "key": "reserve-headroom",
+                    "status": "untested",
+                    "summary": "Scale values into a plot area that leaves a fixed 16px band at the top.",
+                    "hypothesis": "If the plot always reserves room, labels can always sit above and no conditional is needed.",
+                    "intervention": "The value-to-pixel mapping is inset from the top; bar heights shrink slightly.",
+                    "controlled": "Plot height, gradient, emphasis.",
+                    "method": "Confirm the reserved band does not make bars look truncated or add dead space to short series."
+                  }
+                ]
+              },
+              {
+                "id": "data-view/chart-library",
+                "screen": "Data View",
+                "question": "Should the Data View adopt a charting library?",
+                "open": true,
+                "solutions": [
+                  {
+                    "key": "hand-rolled",
+                    "status": "shipped",
+                    "summary": "No library. Plain elements and one inline SVG polyline.",
+                    "hypothesis": "The pane needs three simple forms; real buttons keep every point focusable and labelled, and the bundle stays small.",
+                    "intervention": "Nothing. This is the baseline the alternatives are measured against.",
+                    "controlled": "The whole visual language.",
+                    "method": "Decide whether the missing capability is axes and tooltips, or something more fundamental. Only the former justifies a library.",
+                    "result": "Three of the four bugs reported in this area were layout bugs in hand-rolled markup, not capability gaps. A canvas library would not have prevented any of them and would have cost the focusable points.",
+                    "target": "src/components/DataView.tsx:1"
+                  },
+                  {
+                    "key": "chart-js",
+                    "status": "untested",
+                    "summary": "Chart.js for all three series forms.",
+                    "hypothesis": "Mature, canvas-based, good defaults for axes and tooltips.",
+                    "intervention": "Canvas rendering, roughly 200KB added; per-point focus and the existing point tests need rework.",
+                    "controlled": "Palette, spacing scale, on-path emphasis, point-to-evidence mapping.",
+                    "method": "Re-run the Data View tests after swapping. If per-point keyboard access or the data-point testids cannot be preserved cheaply, reject on accessibility grounds."
+                  },
+                  {
+                    "key": "recharts",
+                    "status": "untested",
+                    "summary": "Recharts, which renders SVG rather than canvas.",
+                    "hypothesis": "SVG output keeps text selectable and may allow focusable marks more cheaply than canvas.",
+                    "intervention": "Adds React and d3 dependencies; changes the component shape substantially.",
+                    "controlled": "Palette, emphasis, selection behaviour.",
+                    "method": "Compare bundle and API cost against Chart.js before trialling both."
+                  },
+                  {
+                    "key": "visx",
+                    "status": "untested",
+                    "summary": "Low-level visx primitives, no chart opinions imposed.",
+                    "hypothesis": "The current markup is already close to this, so the migration cost is low and the control is total.",
+                    "intervention": "Granular rewrites per series rather than a drop-in.",
+                    "controlled": "Everything visual.",
+                    "method": "Worth it only if axes and tooltips are the real requirement, since the layout work is already done."
+                  }
+                ]
+              },
+              {
+                "id": "left-pane/heading-spacing",
+                "screen": "Left pane",
+                "question": "How much space sits between a section heading and the content it labels?",
+                "solutions": [
+                  {
+                    "key": "four-px",
+                    "status": "shipped",
+                    "summary": "4px below the heading, via a .ds-section-heading role class.",
+                    "hypothesis": "A 10px mono label flush against 23px serif copy reads as one block; one step on the 4px scale separates them without loosening the pane's rhythm.",
+                    "intervention": "A role class carrying margin-bottom: 4px, applied to Question, Answer and Claims.",
+                    "controlled": "4px base scale, 20px section rhythm, 16px panel padding.",
+                    "method": "Measure the gap from heading bottom to content top. Must be exactly 4.00px in all three sections.",
+                    "result": "0.00px before, 4.00px after in all three sections. The nested Evidence row was deliberately left at 8px because that label follows content rather than introducing it.",
+                    "target": "src/index.css:78"
+                  },
+                  {
+                    "key": "flush",
+                    "status": "rejected",
+                    "summary": "No space; the label sits directly on the content.",
+                    "hypothesis": "Tight setting suits an editorial layout.",
+                    "intervention": "No margin at all.",
+                    "controlled": "Everything else.",
+                    "method": "Read the pane as a whole and judge whether the headings still announce their sections.",
+                    "result": "Measured 0.00px. The headings stopped reading as labels and the pane read as three dense blocks."
+                  },
+                  {
+                    "key": "eight-px",
+                    "status": "untested",
+                    "summary": "8px, matching the chip-to-label step in the spacing scale.",
+                    "hypothesis": "If 4px looks too tight at 21-23px, the next step on the scale is the more consistent choice.",
+                    "intervention": "margin-bottom: 8px.",
+                    "controlled": "The rest of the spacing scale.",
+                    "method": "Compare against the 20px section rhythm. If the gap starts competing with the space between sections, 4px was right."
+                  }
+                ]
+              },
+              {
+                "id": "left-pane/claim-evidence-gap",
+                "screen": "Left pane",
+                "question": "How much space separates a claim from its Evidence row inside the card?",
+                "solutions": [
+                  {
+                    "key": "eight-px",
+                    "status": "shipped",
+                    "summary": "8px (mt-2).",
+                    "hypothesis": "The claim and its evidence are one thought, so the gap should be smaller than the 4px that now separates a heading from its content but larger than nothing.",
+                    "intervention": "Margin above the Evidence label and its chips.",
+                    "controlled": "Card padding, chip sizing, 78px section-heading spacing elsewhere.",
+                    "method": "Confirm the claim text and its evidence still group as a unit rather than reading as two rows.",
+                    "result": "Left unchanged at 8px when the section headings moved to 4px, deliberately: raising or lowering it would break the claim-to-evidence grouping the card depends on.",
+                    "target": "src/components/ClaimList.tsx:52"
+                  },
+                  {
+                    "key": "four-px",
+                    "status": "untested",
+                    "summary": "4px, one step tighter.",
+                    "hypothesis": "Tighter grouping reads as a single unit.",
+                    "intervention": "mt-1.",
+                    "controlled": "Everything else.",
+                    "method": "Check the Evidence row does not start to look like part of the claim sentence."
+                  }
+                ]
+              },
+              {
+                "id": "graph/zoom-floor",
+                "screen": "Graph",
+                "question": "How small may the graph zoom when fitting a narrow pane?",
+                "solutions": [
+                  {
+                    "key": "floor-072",
+                    "status": "shipped",
+                    "summary": "Never below 0.72; pan instead of shrinking further.",
+                    "hypothesis": "Node copy is 14px, so below 0.72 it stops being legible and legibility should win over seeing the whole graph at once.",
+                    "intervention": "fitView is called with minZoom 0.72 and padding 0.14.",
+                    "controlled": "14px node body, read-only canvas, no editing controls.",
+                    "method": "At 1280 and 1512 wide, confirm every node remains readable after a fit and the user can still reach off-screen nodes by panning.",
+                    "result": "0.72 is provisional. It was picked as a starting floor so the whole graph fits the viewport at the default window, and it has not been checked against any real window size. Treat the number as a guess to be measured, not a finding.",
+                    "target": "src/components/EvidenceGraph.tsx:16"
+                  },
+                  {
+                    "key": "no-floor",
+                    "status": "untested",
+                    "summary": "Fit to whatever the pane needs.",
+                    "hypothesis": "Seeing the entire chain at once is worth small type, and the user can zoom in themselves.",
+                    "intervention": "minZoom removed.",
+                    "controlled": "Everything else.",
+                    "method": "Fit at 1024 wide and read the smallest node. If it needs zooming to be read, the floor was justified."
+                  },
+                  {
+                    "key": "reflow-instead-of-scale",
+                    "status": "untested",
+                    "summary": "Keep zoom at 1 and rearrange the layout to fit the pane.",
+                    "hypothesis": "Narrow panes should change the graph's shape, not its legibility.",
+                    "intervention": "Layout becomes pane-width aware; nodes reflow to a narrower column order.",
+                    "controlled": "The fixed question-to-source reading order.",
+                    "method": "Compare both layouts at 1024 wide. Reflow is more work but removes the tradeoff entirely."
+                  }
+                ]
+              },
+              {
+                "id": "shell/case-switcher",
+                "screen": "Shell",
+                "question": "How does the user move between the three demo cases?",
+                "solutions": [
+                  {
+                    "key": "native-select",
+                    "status": "shipped",
+                    "summary": "A native select, styled to match, labelled Demo case.",
+                    "hypothesis": "With only three cases, a dropdown costs less header width than tabs and behaves correctly on every platform.",
+                    "intervention": "The control itself; the case model is unchanged.",
+                    "controlled": "Case titles and order, reset-on-switch behaviour.",
+                    "method": "Confirm the control is keyboard reachable, announces its options, and that switching cases resets the selection to something valid.",
+                    "result": "Replaced the three tabs with a native select after an explicit request. The select behaves the same on every platform and costs less header width, but neither the tabs nor the select were measured, so the width claim is reasoning, not data.",
+                    "target": "src/components/CaseSelector.tsx:5"
+                  },
+                  {
+                    "key": "tabs",
+                    "status": "rejected",
+                    "summary": "Three tabs in the header.",
+                    "hypothesis": "Tabs show all the cases at once and make switching one click.",
+                    "intervention": "Header control.",
+                    "controlled": "Everything else.",
+                    "method": "Measure the header at 1280 wide with the longest case title.",
+                    "result": "Superseded by an explicit request to move to a dropdown. It also crowded the header, which carries the brand and the case title."
+                  },
+                  {
+                    "key": "segmented",
+                    "status": "untested",
+                    "summary": "A segmented control showing all three.",
+                    "hypothesis": "Gives back the at-a-glance visibility of tabs with less width than three full tabs.",
+                    "intervention": "Header control; may need shortened labels.",
+                    "controlled": "Case titles and order.",
+                    "method": "Check whether shortened labels stay recognisable, or whether the full titles are needed for orientation."
+                  }
+                ]
+              },
+              {
+                "id": "shell/brand-lockup",
+                "screen": "Shell",
+                "question": "What sits in the header beside the product name?",
+                "solutions": [
+                  {
+                    "key": "mark-and-wordmark",
+                    "status": "shipped",
+                    "summary": "Inline mochi mark, then the wordmark at weight 600. No caption.",
+                    "hypothesis": "The mark and the word alone are enough; a caption competes with the case title for attention.",
+                    "intervention": "Header contents only.",
+                    "controlled": "Cormorant Garamond for the wordmark, Palette A mark colours, tab favicon matches the mark.",
+                    "method": "Confirm the case title still has room to breathe at 1280 wide and that the mark and favicon read as the same logo.",
+                    "result": "The mark stayed, the wordmark went, on an explicit request to remove it. The header is now mark plus case title. No measurement was taken: this was a stated preference rather than a tested result, and it is recorded that way so it is not later cited as evidence that the wordmark hurt.",
+                    "target": "src/components/MochiLogo.tsx:4"
+                  },
+                  {
+                    "key": "with-caption",
+                    "status": "rejected",
+                    "summary": "Mark, wordmark, and the original descriptive caption.",
+                    "hypothesis": "A caption explains the product to a first-time visitor.",
+                    "intervention": "Adds the caption line.",
+                    "controlled": "Mark and wordmark.",
+                    "method": "Judged against the case title's prominence.",
+                    "result": "Removed on request. The caption described the product rather than helping with the task, and it crowded the header."
+                  },
+                  {
+                    "key": "mark-only",
+                    "status": "untested",
+                    "summary": "Mark alone, no wordmark.",
+                    "hypothesis": "Recover the width for the case title.",
+                    "intervention": "Removes the wordmark.",
+                    "controlled": "Mark colours and size.",
+                    "method": "Check the product is still identifiable in a screenshot with no other context."
+                  }
+                ]
+              },
+              {
+                "id": "shell/pane-count",
+                "screen": "Shell",
+                "question": "Should the three panes stay side by side?",
+                "open": true,
+                "solutions": [
+                  {
+                    "key": "three-panes",
+                    "status": "shipped",
+                    "summary": "Source, graph and Data View visible together, widths scaled with clamp().",
+                    "hypothesis": "The whole point is watching a selection propagate, so the panes must be visible at the same time for that to read.",
+                    "intervention": "Three-column grid with clamp-based widths.",
+                    "controlled": "The 0.72 zoom floor, which assumes a centre pane that can get narrow.",
+                    "method": "Confirm all three panes are usable at 1280 and that the centre pane never falls below a width the graph can use.",
+                    "result": "Three panes from the first build: question, data, source. The source pane was later widened to 26vw because the document read as cramped. The three-pane split itself has never been tested with a person, so it remains the largest unvalidated assumption in this version.",
+                    "target": "src/app/App.tsx:52"
+                  },
+                  {
+                    "key": "two-panes",
+                    "status": "untested",
+                    "summary": "Source plus a tabbed workspace, as the graph and Data View already share.",
+                    "hypothesis": "The graph and the Data View are two views of one selection, so showing both at once may be redundant.",
+                    "intervention": "Workspace becomes the only middle column.",
+                    "controlled": "Everything inside each pane.",
+                    "method": "Watch a full selection cycle with the panes merged. If it still feels connected, this is the better layout and it gives the graph real width."
+                  }
+                ]
+              },
+              {
+                "id": "state/initial-selection",
+                "screen": "State",
+                "question": "What is selected when the app first opens?",
+                "solutions": [
+                  {
+                    "key": "case-default",
+                    "status": "shipped",
+                    "summary": "The first claim and its first evidence, the same as a case switch.",
+                    "hypothesis": "The app should never open on a blank pane, so the initial state and the switch behaviour are made identical.",
+                    "intervention": "initialState is derived from defaultSelectionFor instead of hardcoded nulls.",
+                    "controlled": "The reset-on-switch rule.",
+                    "method": "On load, resolveSelection must report hasSelection true and a non-empty path. At least one Data View point must be on path.",
+                    "result": "Before: hasSelection false, pathDataPointIds empty, 0 of 4 points on path in every case, so all bars fell to the muted branch and the pane looked broken. After: 4 of 4 on path in case 1.",
+                    "target": "src/state/selection.ts:26"
+                  },
+                  {
+                    "key": "empty-with-prompt",
+                    "status": "rejected",
+                    "summary": "Open with nothing selected and invite the user to click a claim.",
+                    "hypothesis": "An untouched state is honest about there being three claims to choose from.",
+                    "intervention": "Nulls, with a prompt in the source and Data View panes.",
+                    "controlled": "Everything else.",
+                    "method": "Check the empty state still explains the model rather than looking like a failure to load.",
+                    "result": "The panes had no such prompt, so the empty state read as a rendering failure. A prompt would be needed to make this choice viable."
+                  }
+                ]
+              },
+              {
+                "id": "design/palette",
+                "screen": "Design system",
+                "question": "Which palette defines the product?",
+                "solutions": [
+                  {
+                    "key": "palette-a-editorial",
+                    "status": "shipped",
+                    "summary": "Palette A: warm cream canvas, serif display type, mint and periwinkle accents.",
+                    "hypothesis": "An editorial palette suits a product about reading sources, and the pastel accents keep emphasis gentle.",
+                    "intervention": "Colour tokens and the type pairing.",
+                    "controlled": "4px scale, hairline rules, no shadows, pill radii.",
+                    "method": "Check body copy contrast and that accent colours survive on the cream canvas at 45% opacity, which the Data View relies on.",
+                    "result": "The 45% off-path state stays legible on the light gradient, which is part of why flat grey was rejected.",
+                    "target": "src/index.css:24"
+                  },
+                  {
+                    "key": "palette-b-atmospheric",
+                    "status": "untested",
+                    "summary": "Palette B: dark atmospheric theme.",
+                    "hypothesis": "A dark canvas foregrounds the graph and the highlights.",
+                    "intervention": "All colour tokens; the type pairing largely survives.",
+                    "controlled": "Spacing, radii, rules.",
+                    "method": "Re-check the Data View emphasis rule under dark surfaces, since 45% opacity on a dark canvas is a much weaker signal."
+                  }
+                ]
+              },
+              {
+                "id": "design/motion",
+                "screen": "Design system",
+                "question": "How much motion does the product use?",
+                "solutions": [
+                  {
+                    "key": "gsap-with-reduced-motion",
+                    "status": "shipped",
+                    "summary": "GSAP for case transitions, tab changes and the source reveal, all removed under prefers-reduced-motion.",
+                    "hypothesis": "Motion is what shows a selection propagating; the behaviour must be identical without it, only the movement dropped.",
+                    "intervention": "Tween durations become zero under reduced motion; no state change is removed.",
+                    "controlled": "Every interaction, and the 900ms source wash settling to 45% as a final state rather than an animation.",
+                    "method": "Run the full interaction set twice, once with the media query on. Assert the same end state in both.",
+                    "result": "Covered by a test that keeps every interaction and drops the movement.",
+                    "target": "src/hooks/useReducedMotion.ts:9"
+                  },
+                  {
+                    "key": "css-only",
+                    "status": "untested",
+                    "summary": "CSS transitions and keyframes, dropping GSAP.",
+                    "hypothesis": "The product needs fades and colour washes, not timeline control, so a 40KB dependency is not earning its place.",
+                    "intervention": "Replace the tween calls with CSS; keep the reduced-motion rules.",
+                    "controlled": "End states and interaction coverage.",
+                    "method": "Confirm nothing needs sequencing or interruption. The source reveal currently depends on deterministic, non-interruptible timing, which is the case to check."
+                  }
+                ]
+              }
+            ]
           },
           {
-            "say": "improve data-view/funnel-bars/track-fill",
-            "means": "Same, but only the current solution. Try it and report the measurement either way."
-          },
-          {
-            "say": "try data-view/chart-library/chart-js",
-            "means": "Build that specific alternative and wire it to the same protocol, so it can be compared like for like."
-          },
-          {
-            "say": "list alternatives for left-pane",
-            "means": "Read-only. Enumerate the options with their hypotheses. Change nothing."
-          },
-          {
-            "say": "why is data-view/bar-emphasis rejected?",
-            "means": "Read-only. Answer from the manifest, including the measurement."
+            "id": "proto2",
+            "name": null,
+            "status": "planned",
+            "summary": "Not started. The next version inherits proto1 as its baseline.",
+            "prototypeUrl": null,
+            "doc": null,
+            "userResearch": {
+              "status": "not-collected",
+              "method": null
+            },
+            "buildMeasurements": [],
+            "decisions": []
           }
         ]
-      },
-      "experiments": [
-        {
-          "id": "data-view/funnel-bars",
-          "screen": "Data View",
-          "open": false,
-          "decision": "How is a funnel bar sized so it can never escape its card?",
-          "solutions": [
-            {
-              "key": "track-fill",
-              "status": "current",
-              "summary": "Fill inside a flexible track that absorbs the free space.",
-              "hypothesis": "If the percentage resolves against a track rather than the whole row, 100% fills the track exactly and can never overflow.",
-              "varies": "An extra flex track wraps the bar; the fill is a block child sized as a percentage of the track.",
-              "holds": "78px label, 56px value, 12px gaps, pill radius, 24px bar height, evidence chips on the right.",
-              "evaluate": "Measure the fill's right edge against the card's inner content edge at 1280 and 1512 wide. Pass when no descendant of any series figure crosses that edge.",
-              "measured": "Card inner right edge 928.4. Track 400px on both rows. Fills 400px (100%) and 200px (50%). Widest descendant right edge 887.2. No overflow in any of the five series across three cases.",
-              "target": "src/components/DataView.tsx:192"
-            },
-            {
-              "key": "direct-percentage",
-              "status": "rejected",
-              "summary": "width: N% straight on the bar as a flex item.",
-              "hypothesis": "The fixed label and value columns are small enough that the percentage can simply be taken against the row.",
-              "varies": "No wrapper. The bar carries the percentage itself.",
-              "holds": "Same label, value, gap and chip sizes.",
-              "evaluate": "Check whether the bar's percentage is measured against the row rather than the space left by its siblings.",
-              "measured": "A percentage on a flex item resolves against the containing block, so 100% asked for the full row width plus the 78px label, 56px value and two 12px gaps. Bar right edge landed at 977.2 against a card inner edge of 928.4. Only the 100% row overflowed, which is why it looked intermittent."
-            },
-            {
-              "key": "fixed-columns",
-              "status": "alternative",
-              "summary": "Fixed-width columns for label, bar and value.",
-              "hypothesis": "If the value is always the last digit count, the bar does not need to flex at all.",
-              "varies": "Bar track becomes a fixed pixel width; the fill is a percentage of it.",
-              "holds": "Label and value typography, chips.",
-              "evaluate": "Check the series still reads correctly at 1024 wide, where a fixed track leaves dead space."
-            },
-            {
-              "key": "chart-js",
-              "status": "alternative",
-              "summary": "Draw the funnel with Chart.js instead of markup.",
-              "hypothesis": "A real chart library handles sizing, axes and tooltips correctly by construction.",
-              "varies": "Canvas rendering replaces the HTML row.",
-              "holds": "Palette, 4px spacing scale, on-path emphasis, click-to-select behaviour.",
-              "evaluate": "Confirm per-point focusability and screen-reader labels survive, and that the series still fits at 1024 wide.",
-              "note": "Sizing was never the reason the bar overflowed, so a library would not have caught the original bug. Worth it only for the axes and tooltips, not for the layout."
-            }
-          ]
-        },
-        {
-          "id": "data-view/bar-emphasis",
-          "screen": "Data View",
-          "open": false,
-          "decision": "How does a bar show that it is not backed by the selected claim?",
-          "solutions": [
-            {
-              "key": "gradient-at-45",
-              "status": "current",
-              "summary": "Same brand gradient, 45% opacity. Value labels stay at full strength.",
-              "hypothesis": "Emphasis can be carried by opacity alone, so a recessive series still reads as part of the same chart.",
-              "varies": "Fill opacity 1 on path, 0.45 off path. Nothing else changes.",
-              "holds": "Gradient, bar geometry, label size and colour.",
-              "evaluate": "With a claim selected, every bar must still carry the gradient and its label must be readable. Count bars without the gradient; it must be zero.",
-              "measured": "Zero bars without the gradient in all five series. Off-path rows in case 2 sit at opacity 0.45 and remain legible.",
-              "target": "src/components/DataView.tsx:11"
-            },
-            {
-              "key": "flat-grey",
-              "status": "rejected",
-              "summary": "Off-path bars drop to a grey fill at 45% opacity.",
-              "hypothesis": "A neutral fill reads as clearly inactive without needing a second brand colour.",
-              "varies": "Off-path bars take a grey derived from the rule colour instead of the gradient.",
-              "holds": "Everything else.",
-              "evaluate": "Does the series still read as a chart when nothing is emphasised?",
-              "measured": "No. On load, with the empty-path bug present, all four bars rendered grey and the pane read as unstyled rather than as a chart. Contributed directly to the report that the Data View was broken."
-            },
-            {
-              "key": "outline-only",
-              "status": "alternative",
-              "summary": "Off-path bars keep full colour but gain a dashed outline.",
-              "hypothesis": "Emphasis belongs in the border, not the fill, so colour stays truthful to the value.",
-              "varies": "Off-path bars get a dashed hairline; opacity stays at 1.",
-              "holds": "Gradient, geometry.",
-              "evaluate": "Check the dashed outline is still distinguishable at 1024 wide where bars are short."
-            },
-            {
-              "key": "no-de-emphasis",
-              "status": "alternative",
-              "summary": "All bars at full strength; selection shown only in the source pane and graph.",
-              "hypothesis": "The Data View is a chart, not a provenance view, and should not encode selection at all.",
-              "varies": "Removes the emphasis encoding entirely.",
-              "holds": "Click-to-select still selects.",
-              "evaluate": "Confirm the pane still feels connected to the claim when only the source reacts. This is a real design disagreement worth settling deliberately, not by default."
-            }
-          ]
-        },
-        {
-          "id": "data-view/trend-line",
-          "screen": "Data View",
-          "open": false,
-          "decision": "How is the trend polyline positioned across its plot?",
-          "solutions": [
-            {
-              "key": "explicit-width",
-              "status": "current",
-              "summary": "Width set to 100% alongside the explicit height, with preserveAspectRatio=none.",
-              "hypothesis": "Stating the width removes the aspect-ratio fallback that inset-x-0 cannot override.",
-              "varies": "Adds width: 100% to the inline style.",
-              "holds": "viewBox 0 0 100 100, non-scaling stroke, 116px plot height, dot positions.",
-              "evaluate": "Compare the SVG's rendered width to the plot row's width, and the line's mapped points to the dot centres. Pass when the offset is under 1px on every point.",
-              "measured": "SVG width 603.2 equals the plot row width 603.2. Worst line-to-dot offset 0.0px on all three points.",
-              "target": "src/components/DataView.tsx:139"
-            },
-            {
-              "key": "height-implies-width",
-              "status": "rejected",
-              "summary": "Only a height is set; the square viewBox is expected to stretch it.",
-              "hypothesis": "An absolutely positioned box with left and right set will fill its containing block.",
-              "varies": "Inline style carries height only.",
-              "holds": "Same viewBox and plot height.",
-              "evaluate": "Measure the SVG's rendered width against the plot row width.",
-              "measured": "The square viewBox made the SVG 116 by 116 for a 603px row, and inset-x-0 did not override it. The x-range was crushed into the left fifth: line-to-dot dx of -81, -244 and -406px, while dy stayed at 0.0 because the vertical mapping was already correct."
-            },
-            {
-              "key": "chart-lib-with-axes",
-              "status": "alternative",
-              "summary": "Replace the hand-rolled SVG with a chart that supplies a y-axis and gridlines.",
-              "hypothesis": "Three points with no axis is the weakest part of the pane, and a library is the fastest route to an axis.",
-              "varies": "Chart rendering replaces the inline SVG; bars may follow.",
-              "holds": "Palette, on-path emphasis, point-to-evidence mapping.",
-              "evaluate": "Decide whether the pane is still mostly a chart or mostly a provenance index before choosing a library."
-            }
-          ]
-        },
-        {
-          "id": "data-view/value-label",
-          "screen": "Data View",
-          "open": false,
-          "decision": "Where does the value label sit when its bar reaches the top of the plot?",
-          "solutions": [
-            {
-              "key": "flip-inside",
-              "status": "current",
-              "summary": "Above the bar, or inside its top when the bar reaches the ceiling.",
-              "hypothesis": "A single conditional keeps the label off the bar in the common case and legible in the extreme case.",
-              "varies": "If the bar top is within 13px of the plot ceiling, the label moves inside the bar by 3px.",
-              "holds": "10px mono, ink colour, horizontal centring, periwinkle gradient underneath.",
-              "evaluate": "Check contrast of ink on the light gradient when the label is inside, and that the label never leaves the plot box.",
-              "measured": "Ink on the pastel gradient stays well above contrast minimum; the label sits 7-17px inside a 0-116px plot.",
-              "target": "src/components/DataView.tsx:86"
-            },
-            {
-              "key": "clamp-above",
-              "status": "rejected",
-              "summary": "Always above the bar, clamped to the plot's top edge.",
-              "hypothesis": "One rule is simpler than a conditional.",
-              "varies": "Label top is max(1, barTop - 13).",
-              "holds": "Label size and colour.",
-              "evaluate": "Check whether a full-height bar's label overlaps its own fill.",
-              "measured": "It did. At full height the bar top is 0, the clamp put the label at 1px, and the number landed on the bar."
-            },
-            {
-              "key": "reserve-headroom",
-              "status": "alternative",
-              "summary": "Scale values into a plot area that leaves a fixed 16px band at the top.",
-              "hypothesis": "If the plot always reserves room, labels can always sit above and no conditional is needed.",
-              "varies": "The value-to-pixel mapping is inset from the top; bar heights shrink slightly.",
-              "holds": "Plot height, gradient, emphasis.",
-              "evaluate": "Confirm the reserved band does not make bars look truncated or add dead space to short series."
-            }
-          ]
-        },
-        {
-          "id": "data-view/chart-library",
-          "screen": "Data View",
-          "open": true,
-          "decision": "Should the Data View adopt a charting library?",
-          "solutions": [
-            {
-              "key": "hand-rolled",
-              "status": "current",
-              "summary": "No library. Plain elements and one inline SVG polyline.",
-              "hypothesis": "The pane needs three simple forms; real buttons keep every point focusable and labelled, and the bundle stays small.",
-              "varies": "Nothing. This is the baseline the alternatives are measured against.",
-              "holds": "The whole visual language.",
-              "evaluate": "Decide whether the missing capability is axes and tooltips, or something more fundamental. Only the former justifies a library.",
-              "measured": "Three of the four bugs reported in this area were layout bugs in hand-rolled markup, not capability gaps. A canvas library would not have prevented any of them and would have cost the focusable points.",
-              "target": "src/components/DataView.tsx:1"
-            },
-            {
-              "key": "chart-js",
-              "status": "alternative",
-              "summary": "Chart.js for all three series forms.",
-              "hypothesis": "Mature, canvas-based, good defaults for axes and tooltips.",
-              "varies": "Canvas rendering, roughly 200KB added; per-point focus and the existing point tests need rework.",
-              "holds": "Palette, spacing scale, on-path emphasis, point-to-evidence mapping.",
-              "evaluate": "Re-run the Data View tests after swapping. If per-point keyboard access or the data-point testids cannot be preserved cheaply, reject on accessibility grounds."
-            },
-            {
-              "key": "recharts",
-              "status": "alternative",
-              "summary": "Recharts, which renders SVG rather than canvas.",
-              "hypothesis": "SVG output keeps text selectable and may allow focusable marks more cheaply than canvas.",
-              "varies": "Adds React and d3 dependencies; changes the component shape substantially.",
-              "holds": "Palette, emphasis, selection behaviour.",
-              "evaluate": "Compare bundle and API cost against Chart.js before trialling both."
-            },
-            {
-              "key": "visx",
-              "status": "alternative",
-              "summary": "Low-level visx primitives, no chart opinions imposed.",
-              "hypothesis": "The current markup is already close to this, so the migration cost is low and the control is total.",
-              "varies": "Granular rewrites per series rather than a drop-in.",
-              "holds": "Everything visual.",
-              "evaluate": "Worth it only if axes and tooltips are the real requirement, since the layout work is already done."
-            }
-          ]
-        },
-        {
-          "id": "left-pane/heading-spacing",
-          "screen": "Left pane",
-          "open": false,
-          "decision": "How much space sits between a section heading and the content it labels?",
-          "solutions": [
-            {
-              "key": "four-px",
-              "status": "current",
-              "summary": "4px below the heading, via a .ds-section-heading role class.",
-              "hypothesis": "A 10px mono label flush against 23px serif copy reads as one block; one step on the 4px scale separates them without loosening the pane's rhythm.",
-              "varies": "A role class carrying margin-bottom: 4px, applied to Question, Answer and Claims.",
-              "holds": "4px base scale, 20px section rhythm, 16px panel padding.",
-              "evaluate": "Measure the gap from heading bottom to content top. Must be exactly 4.00px in all three sections.",
-              "measured": "0.00px before, 4.00px after in all three sections. The nested Evidence row was deliberately left at 8px because that label follows content rather than introducing it.",
-              "target": "src/index.css:78"
-            },
-            {
-              "key": "flush",
-              "status": "rejected",
-              "summary": "No space; the label sits directly on the content.",
-              "hypothesis": "Tight setting suits an editorial layout.",
-              "varies": "No margin at all.",
-              "holds": "Everything else.",
-              "evaluate": "Read the pane as a whole and judge whether the headings still announce their sections.",
-              "measured": "Measured 0.00px. The headings stopped reading as labels and the pane read as three dense blocks."
-            },
-            {
-              "key": "eight-px",
-              "status": "alternative",
-              "summary": "8px, matching the chip-to-label step in the spacing scale.",
-              "hypothesis": "If 4px looks too tight at 21-23px, the next step on the scale is the more consistent choice.",
-              "varies": "margin-bottom: 8px.",
-              "holds": "The rest of the spacing scale.",
-              "evaluate": "Compare against the 20px section rhythm. If the gap starts competing with the space between sections, 4px was right."
-            }
-          ]
-        },
-        {
-          "id": "left-pane/claim-evidence-gap",
-          "screen": "Left pane",
-          "open": false,
-          "decision": "How much space separates a claim from its Evidence row inside the card?",
-          "solutions": [
-            {
-              "key": "eight-px",
-              "status": "current",
-              "summary": "8px (mt-2).",
-              "hypothesis": "The claim and its evidence are one thought, so the gap should be smaller than the 4px that now separates a heading from its content but larger than nothing.",
-              "varies": "Margin above the Evidence label and its chips.",
-              "holds": "Card padding, chip sizing, 78px section-heading spacing elsewhere.",
-              "evaluate": "Confirm the claim text and its evidence still group as a unit rather than reading as two rows.",
-              "measured": "Left unchanged at 8px when the section headings moved to 4px, deliberately: raising or lowering it would break the claim-to-evidence grouping the card depends on.",
-              "target": "src/components/ClaimList.tsx:52"
-            },
-            {
-              "key": "four-px",
-              "status": "alternative",
-              "summary": "4px, one step tighter.",
-              "hypothesis": "Tighter grouping reads as a single unit.",
-              "varies": "mt-1.",
-              "holds": "Everything else.",
-              "evaluate": "Check the Evidence row does not start to look like part of the claim sentence."
-            }
-          ]
-        },
-        {
-          "id": "graph/zoom-floor",
-          "screen": "Graph",
-          "open": false,
-          "decision": "How small may the graph zoom when fitting a narrow pane?",
-          "solutions": [
-            {
-              "key": "floor-072",
-              "status": "current",
-              "summary": "Never below 0.72; pan instead of shrinking further.",
-              "hypothesis": "Node copy is 14px, so below 0.72 it stops being legible and legibility should win over seeing the whole graph at once.",
-              "varies": "fitView is called with minZoom 0.72 and padding 0.14.",
-              "holds": "14px node body, read-only canvas, no editing controls.",
-              "evaluate": "At 1280 and 1512 wide, confirm every node remains readable after a fit and the user can still reach off-screen nodes by panning.",
-              "target": "src/components/EvidenceGraph.tsx:16"
-            },
-            {
-              "key": "no-floor",
-              "status": "alternative",
-              "summary": "Fit to whatever the pane needs.",
-              "hypothesis": "Seeing the entire chain at once is worth small type, and the user can zoom in themselves.",
-              "varies": "minZoom removed.",
-              "holds": "Everything else.",
-              "evaluate": "Fit at 1024 wide and read the smallest node. If it needs zooming to be read, the floor was justified."
-            },
-            {
-              "key": "reflow-instead-of-scale",
-              "status": "alternative",
-              "summary": "Keep zoom at 1 and rearrange the layout to fit the pane.",
-              "hypothesis": "Narrow panes should change the graph's shape, not its legibility.",
-              "varies": "Layout becomes pane-width aware; nodes reflow to a narrower column order.",
-              "holds": "The fixed question-to-source reading order.",
-              "evaluate": "Compare both layouts at 1024 wide. Reflow is more work but removes the tradeoff entirely."
-            }
-          ]
-        },
-        {
-          "id": "shell/case-switcher",
-          "screen": "Shell",
-          "open": false,
-          "decision": "How does the user move between the three demo cases?",
-          "solutions": [
-            {
-              "key": "native-select",
-              "status": "current",
-              "summary": "A native select, styled to match, labelled Demo case.",
-              "hypothesis": "With only three cases, a dropdown costs less header width than tabs and behaves correctly on every platform.",
-              "varies": "The control itself; the case model is unchanged.",
-              "holds": "Case titles and order, reset-on-switch behaviour.",
-              "evaluate": "Confirm the control is keyboard reachable, announces its options, and that switching cases resets the selection to something valid.",
-              "target": "src/components/CaseSelector.tsx:5"
-            },
-            {
-              "key": "tabs",
-              "status": "rejected",
-              "summary": "Three tabs in the header.",
-              "hypothesis": "Tabs show all the cases at once and make switching one click.",
-              "varies": "Header control.",
-              "holds": "Everything else.",
-              "evaluate": "Measure the header at 1280 wide with the longest case title.",
-              "measured": "Superseded by an explicit request to move to a dropdown. It also crowded the header, which carries the brand and the case title."
-            },
-            {
-              "key": "segmented",
-              "status": "alternative",
-              "summary": "A segmented control showing all three.",
-              "hypothesis": "Gives back the at-a-glance visibility of tabs with less width than three full tabs.",
-              "varies": "Header control; may need shortened labels.",
-              "holds": "Case titles and order.",
-              "evaluate": "Check whether shortened labels stay recognisable, or whether the full titles are needed for orientation."
-            }
-          ]
-        },
-        {
-          "id": "shell/brand-lockup",
-          "screen": "Shell",
-          "open": false,
-          "decision": "What sits in the header beside the product name?",
-          "solutions": [
-            {
-              "key": "mark-and-wordmark",
-              "status": "current",
-              "summary": "Inline mochi mark, then the wordmark at weight 600. No caption.",
-              "hypothesis": "The mark and the word alone are enough; a caption competes with the case title for attention.",
-              "varies": "Header contents only.",
-              "holds": "Cormorant Garamond for the wordmark, Palette A mark colours, tab favicon matches the mark.",
-              "evaluate": "Confirm the case title still has room to breathe at 1280 wide and that the mark and favicon read as the same logo.",
-              "target": "src/components/MochiLogo.tsx:4"
-            },
-            {
-              "key": "with-caption",
-              "status": "rejected",
-              "summary": "Mark, wordmark, and the original descriptive caption.",
-              "hypothesis": "A caption explains the product to a first-time visitor.",
-              "varies": "Adds the caption line.",
-              "holds": "Mark and wordmark.",
-              "evaluate": "Judged against the case title's prominence.",
-              "measured": "Removed on request. The caption described the product rather than helping with the task, and it crowded the header."
-            },
-            {
-              "key": "mark-only",
-              "status": "alternative",
-              "summary": "Mark alone, no wordmark.",
-              "hypothesis": "Recover the width for the case title.",
-              "varies": "Removes the wordmark.",
-              "holds": "Mark colours and size.",
-              "evaluate": "Check the product is still identifiable in a screenshot with no other context."
-            }
-          ]
-        },
-        {
-          "id": "shell/pane-count",
-          "screen": "Shell",
-          "open": true,
-          "decision": "Should the three panes stay side by side?",
-          "solutions": [
-            {
-              "key": "three-panes",
-              "status": "current",
-              "summary": "Source, graph and Data View visible together, widths scaled with clamp().",
-              "hypothesis": "The whole point is watching a selection propagate, so the panes must be visible at the same time for that to read.",
-              "varies": "Three-column grid with clamp-based widths.",
-              "holds": "The 0.72 zoom floor, which assumes a centre pane that can get narrow.",
-              "evaluate": "Confirm all three panes are usable at 1280 and that the centre pane never falls below a width the graph can use.",
-              "target": "src/app/App.tsx:52"
-            },
-            {
-              "key": "two-panes",
-              "status": "alternative",
-              "summary": "Source plus a tabbed workspace, as the graph and Data View already share.",
-              "hypothesis": "The graph and the Data View are two views of one selection, so showing both at once may be redundant.",
-              "varies": "Workspace becomes the only middle column.",
-              "holds": "Everything inside each pane.",
-              "evaluate": "Watch a full selection cycle with the panes merged. If it still feels connected, this is the better layout and it gives the graph real width."
-            }
-          ]
-        },
-        {
-          "id": "state/initial-selection",
-          "screen": "State",
-          "open": false,
-          "decision": "What is selected when the app first opens?",
-          "solutions": [
-            {
-              "key": "case-default",
-              "status": "current",
-              "summary": "The first claim and its first evidence, the same as a case switch.",
-              "hypothesis": "The app should never open on a blank pane, so the initial state and the switch behaviour are made identical.",
-              "varies": "initialState is derived from defaultSelectionFor instead of hardcoded nulls.",
-              "holds": "The reset-on-switch rule.",
-              "evaluate": "On load, resolveSelection must report hasSelection true and a non-empty path. At least one Data View point must be on path.",
-              "measured": "Before: hasSelection false, pathDataPointIds empty, 0 of 4 points on path in every case, so all bars fell to the muted branch and the pane looked broken. After: 4 of 4 on path in case 1.",
-              "target": "src/state/selection.ts:26"
-            },
-            {
-              "key": "empty-with-prompt",
-              "status": "rejected",
-              "summary": "Open with nothing selected and invite the user to click a claim.",
-              "hypothesis": "An untouched state is honest about there being three claims to choose from.",
-              "varies": "Nulls, with a prompt in the source and Data View panes.",
-              "holds": "Everything else.",
-              "evaluate": "Check the empty state still explains the model rather than looking like a failure to load.",
-              "measured": "The panes had no such prompt, so the empty state read as a rendering failure. A prompt would be needed to make this choice viable."
-            }
-          ]
-        },
-        {
-          "id": "design/palette",
-          "screen": "Design system",
-          "open": false,
-          "decision": "Which palette defines the product?",
-          "solutions": [
-            {
-              "key": "palette-a-editorial",
-              "status": "current",
-              "summary": "Palette A: warm cream canvas, serif display type, mint and periwinkle accents.",
-              "hypothesis": "An editorial palette suits a product about reading sources, and the pastel accents keep emphasis gentle.",
-              "varies": "Colour tokens and the type pairing.",
-              "holds": "4px scale, hairline rules, no shadows, pill radii.",
-              "evaluate": "Check body copy contrast and that accent colours survive on the cream canvas at 45% opacity, which the Data View relies on.",
-              "measured": "The 45% off-path state stays legible on the light gradient, which is part of why flat grey was rejected.",
-              "target": "src/index.css:24"
-            },
-            {
-              "key": "palette-b-atmospheric",
-              "status": "alternative",
-              "summary": "Palette B: dark atmospheric theme.",
-              "hypothesis": "A dark canvas foregrounds the graph and the highlights.",
-              "varies": "All colour tokens; the type pairing largely survives.",
-              "holds": "Spacing, radii, rules.",
-              "evaluate": "Re-check the Data View emphasis rule under dark surfaces, since 45% opacity on a dark canvas is a much weaker signal."
-            }
-          ]
-        },
-        {
-          "id": "design/motion",
-          "screen": "Design system",
-          "open": false,
-          "decision": "How much motion does the product use?",
-          "solutions": [
-            {
-              "key": "gsap-with-reduced-motion",
-              "status": "current",
-              "summary": "GSAP for case transitions, tab changes and the source reveal, all removed under prefers-reduced-motion.",
-              "hypothesis": "Motion is what shows a selection propagating; the behaviour must be identical without it, only the movement dropped.",
-              "varies": "Tween durations become zero under reduced motion; no state change is removed.",
-              "holds": "Every interaction, and the 900ms source wash settling to 45% as a final state rather than an animation.",
-              "evaluate": "Run the full interaction set twice, once with the media query on. Assert the same end state in both.",
-              "measured": "Covered by a test that keeps every interaction and drops the movement.",
-              "target": "src/hooks/useReducedMotion.ts:9"
-            },
-            {
-              "key": "css-only",
-              "status": "alternative",
-              "summary": "CSS transitions and keyframes, dropping GSAP.",
-              "hypothesis": "The product needs fades and colour washes, not timeline control, so a 40KB dependency is not earning its place.",
-              "varies": "Replace the tween calls with CSS; keep the reduced-motion rules.",
-              "holds": "End states and interaction coverage.",
-              "evaluate": "Confirm nothing needs sequencing or interruption. The source reveal currently depends on deterministic, non-interruptible timing, which is the case to check."
-            }
-          ]
-        }
-      ]
-    }
+      }
     </script>
 
     <script>
       const manifest = JSON.parse(document.getElementById('experiment-manifest').textContent)
+      const C = manifest.conventions
 
       const el = (tag, cls, text) => {
         const n = document.createElement(tag)
@@ -851,124 +935,296 @@
         return n
       }
 
-      const STATUS_ORDER = { current: 0, alternative: 1, rejected: 2 }
+      const SOLUTION_ORDER = { shipped: 0, untested: 1, rejected: 2 }
+      const chip = (status) => el('span', 'chip chip-' + status, status)
 
-      const statusChip = (status) => {
-        const c = el('span', 'chip chip-' + status, status)
-        return c
-      }
+      /** Full id for one solution, e.g. proto1/data-view/trend-line/explicit-width */
+      const solutionId = (proto, decision, solution) => proto.id + '/' + decision.id + '/' + solution.key
 
-      // --- "How to direct me" -------------------------------------------------
+      /** Every untested solution in the shipped version, offered as the next thing to try. */
+      const nextCandidates = (from) =>
+        from.decisions.flatMap((d) =>
+          d.solutions
+            .filter((s) => s.status === 'untested')
+            .map((s) => ({ decision: d, solution: s, id: from.id + '/' + d.id + '/' + s.key })),
+        )
+
+      // --- "How to direct me" -----------------------------------------------
       const rules = document.getElementById('rules')
-      for (const rule of manifest.conventions.rules) {
+      for (const rule of C.rules) {
         const row = el('div', 'panel rule')
         row.append(el('span', 'say', '"' + rule.say + '"'), el('span', 'means', rule.means))
         rules.append(row)
       }
 
-      // --- decision index ------------------------------------------------------
+      // --- the protocol ------------------------------------------------------
+      document.getElementById('protocol-question').textContent = C.protocol.question
+      const protocolEl = document.getElementById('protocol')
+      for (const field of C.protocol.fields) {
+        const row = el('div', 'panel rule')
+        row.append(el('span', 'say', field.name), el('span', 'means', field.means))
+        protocolEl.append(row)
+      }
+
       const index = document.getElementById('index')
       const countEl = document.getElementById('count')
       const search = document.getElementById('q')
-      const filterButtons = [...document.querySelectorAll('.filter')]
+      const filterButtons = [...document.querySelectorAll('.filter[data-filter]')]
 
       let filter = 'all'
       let query = ''
 
-      const matches = (decision) => {
-        if (filter === 'open' && !decision.open) return false
-        if (filter === 'current' && !decision.solutions.some((s) => s.status === 'current')) return false
-        if (filter === 'rejected' && !decision.solutions.some((s) => s.status === 'rejected')) return false
+      const decisionMatches = (proto, decision) => {
         if (!query) return true
-        const hay = [decision.id, decision.decision, decision.screen, ...decision.solutions.map((s) => s.key + ' ' + s.summary)]
-          .join(' ')
-          .toLowerCase()
+        const hay = [proto.id, decision.id, decision.question, decision.screen,
+          ...decision.solutions.map((s) => s.key + ' ' + s.summary)].join(' ').toLowerCase()
         return query.split(/\s+/).every((term) => hay.includes(term))
+      }
+
+      const protoMatches = (proto) => {
+        if (filter !== 'all' && proto.status !== filter) return false
+        if (!query) return true
+        if (protoMatchesOwnText(proto)) return true
+        return proto.decisions.some((d) => decisionMatches(proto, d))
+      }
+
+      const protoMatchesOwnText = (proto) => {
+        const hay = [proto.id, proto.name || '', proto.summary || ''].join(' ').toLowerCase()
+        return query.split(/\s+/).every((term) => hay.includes(term))
+      }
+
+      /** Everything a version's evidence block should say about its research. */
+      const researchBlock = (proto) => {
+        const block = el('div', 'evidence-block')
+        const head = el('div', 'evidence-head')
+        head.append(el('h4', null, 'UX research'), el('span', 'kind', 'user-session'))
+        block.append(head)
+
+        const body = el('div', 'evidence-body')
+        const r = proto.userResearch || {}
+
+        if (r.status === 'collected' && r.notes) {
+          body.append(el('p', null, r.notes))
+        } else {
+          const line = el('div', 'not-collected')
+          line.append(el('span', 'flag', 'not collected'))
+          body.append(line)
+          body.append(
+            el(
+              'p',
+              null,
+              r.notes ||
+                'No one outside the build has used this version, so there is no evidence about comprehension, trust, or task success.',
+            ),
+          )
+        }
+
+        if (r.method) {
+          const m = el('p', 'kind-def')
+          m.append(el('span', 'label', 'to collect it: '))
+          m.append(document.createTextNode(r.method))
+          body.append(m)
+        }
+        const def = el('p', 'kind-def')
+        def.append(el('span', 'label', 'what this kind of evidence covers: '))
+        def.append(document.createTextNode(C.evidenceKinds['user-session']))
+        body.append(def)
+
+        block.append(body)
+        return block
+      }
+
+      /** Objective build measurements, as a before/after table. */
+      const measurementsBlock = (proto) => {
+        const rows = proto.buildMeasurements || []
+        const block = el('div', 'evidence-block')
+        const head = el('div', 'evidence-head')
+        head.append(el('h4', null, 'Build measurements'), el('span', 'kind', 'build-measurement'))
+        block.append(head)
+
+        const body = el('div', 'evidence-body')
+        if (rows.length === 0) {
+          body.append(el('p', null, 'No build measurements recorded for this version.'))
+        } else {
+          const table = el('table')
+          const thead = el('thead')
+          const hr = el('tr')
+          for (const h of ['Decision', 'Before', 'After']) hr.append(el('th', null, h))
+          thead.append(hr)
+          table.append(thead)
+
+          const tbody = el('tbody')
+          for (const row of rows) {
+            const tr = el('tr')
+            const tdId = el('td')
+            const link = el('a', 'id-chip', row.decision)
+            link.href = '#d-' + proto.id + '-' + row.decision.replace(/[/.]/g, '-')
+            tdId.append(link)
+            tr.append(tdId, el('td', 'was', row.before), el('td', 'now', row.after))
+            tbody.append(tr)
+          }
+          table.append(tbody)
+          body.append(table)
+        }
+
+        const def = el('p', 'kind-def')
+        def.append(el('span', 'label', 'what this kind of evidence covers: '))
+        def.append(document.createTextNode(C.evidenceKinds['build-measurement']))
+        body.append(def)
+        block.append(body)
+        return block
+      }
+
+      /** One decision: the question, and every option considered for it. */
+      const decisionEl = (proto, decision) => {
+        const details = el('details', 'decision')
+        details.id = 'd-' + proto.id + '-' + decision.id.replace(/[/.]/g, '-')
+        details.dataset.decision = decision.id
+
+        const summary = el('summary')
+        summary.append(el('strong', null, decision.question))
+        if (decision.open) summary.append(chip('open'))
+
+        const tally = el('span', 'tally')
+        for (const status of ['shipped', 'untested', 'rejected']) {
+          const n = decision.solutions.filter((s) => s.status === status).length
+          if (n > 0) tally.append(el('span', 'chip chip-' + status, n + ' ' + status))
+        }
+        summary.append(tally)
+        summary.append(el('span', 'id-chip', proto.id + '/' + decision.id))
+        details.append(summary)
+
+        const body = el('div', 'decision-body')
+        body.append(el('p', 'label', decision.screen))
+
+        const list = el('div', 'solutions')
+        const solutions = [...decision.solutions].sort(
+          (a, b) => SOLUTION_ORDER[a.status] - SOLUTION_ORDER[b.status] || a.key.localeCompare(b.key),
+        )
+
+        for (const solution of solutions) {
+          const row = el('div', 'solution')
+          row.dataset.status = solution.status
+
+          const sb = el('div', 'solution-body')
+          const title = el('div', 'solution-title')
+          title.append(el('strong', null, solution.summary), chip(solution.status))
+          title.append(el('span', 'solution-key', solutionId(proto, decision, solution)))
+          sb.append(title)
+
+          const dl = el('dl')
+          const add = (term, value, cls) => {
+            if (!value) return
+            dl.append(el('dt', null, term), el('dd', cls, value))
+          }
+          for (const term of C.protocol.fields) {
+            add(term.name, solution[term.name], term.name === 'result' ? 'result' : null)
+          }
+          if (solution.target) {
+            const dd = el('dd', 'result')
+            dd.append(el('code', null, solution.target))
+            dl.append(el('dt', null, 'lives at'), dd)
+          }
+          if (solution.note) add('note', solution.note)
+          sb.append(dl)
+          row.append(sb)
+          list.append(row)
+        }
+
+        body.append(list)
+        details.append(body)
+        return details
       }
 
       const render = () => {
         index.replaceChildren()
-        const decisions = manifest.experiments.filter(matches)
-        const screens = [...new Set(decisions.map((d) => d.screen))]
+        const protos = manifest.prototypes.filter(protoMatches)
 
-        const totalSolutions = manifest.experiments.reduce((n, d) => n + d.solutions.length, 0)
+        const shownDecisions = protos.reduce((n, p) => n + p.decisions.filter((d) => decisionMatches(p, d)).length, 0)
         countEl.textContent =
-          decisions.length + ' of ' + manifest.experiments.length + ' decisions · ' +
-          manifest.experiments.reduce((n, d) => n + d.solutions.filter((s) => s.status === 'current').length, 0) +
-          ' current of ' + totalSolutions + ' solutions'
+          protos.length + ' of ' + manifest.prototypes.length + ' versions · ' +
+          shownDecisions + ' of ' +
+          manifest.prototypes.reduce((n, p) => n + p.decisions.length, 0) + ' decisions shown'
 
-        if (decisions.length === 0) {
-          index.append(el('div', 'panel empty', 'No decision matches that filter.'))
+        if (protos.length === 0) {
+          index.append(el('div', 'panel empty', 'No version matches that filter.'))
           return
         }
 
-        for (const screen of screens) {
-          const group = el('div', 'screen')
-          const head = el('div', 'decision-head')
-          head.append(el('h3', null, screen))
-          group.append(head)
+        const shipped = manifest.prototypes.find((p) => p.status === 'current') || manifest.prototypes[0]
 
-          for (const decision of decisions.filter((d) => d.screen === screen)) {
-            const card = el('article', 'panel decision')
+        for (const proto of protos) {
+          const card = el('article', 'panel proto')
+          card.dataset.version = proto.id
 
-            const dh = el('div', 'decision-head')
-            dh.append(el('h3', null, decision.decision))
-            if (decision.open) dh.append(statusChip('open'))
-            dh.append(el('span', 'id-chip', decision.id))
-            card.append(dh)
+          const head = el('div', 'proto-head')
+          head.append(el('span', 'id-chip', proto.id), chip(proto.status))
+          head.append(el('h3', null, proto.name || 'Unnamed version'))
+          card.append(head)
+          if (proto.summary) card.append(el('p', 'summary lede', proto.summary))
 
-            const list = el('div', 'solutions')
-            const solutions = [...decision.solutions].sort(
-              (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || a.key.localeCompare(b.key),
+          const links = el('div', 'proto-links')
+          const protoBtn = el('a', 'link-btn' + (proto.prototypeUrl ? ' solid' : ''), 'open prototype')
+          if (proto.prototypeUrl) {
+            protoBtn.href = proto.prototypeUrl
+            protoBtn.target = '_blank'
+            protoBtn.rel = 'noreferrer'
+          } else {
+            protoBtn.setAttribute('aria-disabled', 'true')
+            protoBtn.removeAttribute('href')
+          }
+          links.append(protoBtn)
+
+          const docBtn = el('a', 'link-btn', 'read the doc')
+          if (proto.doc) {
+            docBtn.href = proto.doc
+          } else {
+            docBtn.setAttribute('aria-disabled', 'true')
+            docBtn.removeAttribute('href')
+          }
+          links.append(docBtn)
+          card.append(links)
+
+          const evidence = el('div', 'evidence')
+          evidence.append(researchBlock(proto), measurementsBlock(proto))
+          card.append(evidence)
+
+          const decisions = proto.decisions.filter((d) => decisionMatches(proto, d))
+          const dhead = el('div', 'decisions-head')
+          dhead.append(
+            el('h4', null, decisions.length ? 'Decisions tested' : 'No decisions recorded yet'),
+            el('span', 'count', decisions.length + ' of ' + proto.decisions.length),
+          )
+          card.append(dhead)
+
+          for (const decision of decisions) card.append(decisionEl(proto, decision))
+
+          // A planned version has nothing to show, so point at the untested
+          // options of the version it inherits from.
+          if (proto.status === 'planned' && !decisions.length) {
+            const block = el('div', 'evidence-block')
+            const bhead = el('div', 'evidence-head')
+            bhead.append(
+              el('h4', null, 'Inherited from ' + shipped.id),
+              el('span', 'kind', 'untested options'),
             )
-
-            for (const solution of solutions) {
-              const row = el('div', 'solution')
-              row.dataset.status = solution.status
-
-              const body = el('div', 'solution-body')
-              const title = el('div', 'solution-title')
-              title.append(el('strong', null, solution.summary), statusChip(solution.status))
-              title.append(el('span', 'solution-key', solution.key))
-              body.append(title)
-
-              const dl = el('dl')
-              const add = (term, value, cls) => {
-                if (!value) return
-                dl.append(el('dt', null, term), el('dd', cls, value))
-              }
-              add('hypothesis', solution.hypothesis)
-              add('varies', solution.varies)
-              add('holds', solution.holds)
-              add('evaluate', solution.evaluate)
-              add('measured', solution.measured, 'measured')
-              if (solution.target) {
-                const dd = el('dd', 'measured')
-                dd.append(el('code', null, solution.target))
-                dl.append(el('dt', null, 'lives at'), dd)
-              }
-              if (solution.note) add('note', solution.note)
-              body.append(dl)
-
-              // The current solution is the only one that is actually built, so
-              // it is the only one worth linking to.
-              if (solution.status === 'current') {
-                const open = el('a', 'open-app', 'open the current prototype →')
-                open.href = manifest.conventions.prototypeUrl
-                open.target = '_blank'
-                open.rel = 'noreferrer'
-                body.append(open)
-              }
-
-              row.append(body)
-              list.append(row)
+            block.append(bhead)
+            const bbody = el('div', 'evidence-body')
+            bbody.append(
+              el('p', null, 'This version starts as a copy of ' + shipped.id + '. These options are still untested, and each is a candidate to try next:'),
+            )
+            const cands = el('div', 'candidates')
+            for (const c of nextCandidates(shipped)) {
+              const row = el('div', 'candidate')
+              row.append(el('span', 'id-chip', c.id), chip('untested'), el('span', null, c.solution.summary))
+              cands.append(row)
             }
-
-            card.append(list)
-            group.append(card)
+            bbody.append(cands)
+            block.append(bbody)
+            card.append(block)
           }
 
-          index.append(group)
+          index.append(card)
         }
       }
 
@@ -985,11 +1241,24 @@
         })
       }
 
-      document.getElementById('prototype-link').href = manifest.conventions.prototypeUrl
+      const expandBtn = document.querySelector('.filter[data-expand]')
+      expandBtn.addEventListener('click', () => {
+        const open = expandBtn.getAttribute('aria-pressed') === 'true'
+        for (const d of document.querySelectorAll('details.decision')) d.open = !open
+        expandBtn.setAttribute('aria-pressed', String(!open))
+        expandBtn.textContent = open ? 'Expand all' : 'Collapse all'
+      })
+
+      const current = manifest.prototypes.find((p) => p.status === 'current')
+      if (current && current.prototypeUrl) {
+        const link = document.getElementById('current-link')
+        link.href = current.prototypeUrl
+        link.textContent = 'Open ' + current.id
+      }
 
       document.getElementById('meta').textContent =
         'Manifest version ' + manifest.version + ', last updated ' + manifest.updated + '. ' +
-        'Ids are ' + manifest.conventions.idPattern + '; append /solution-key to name one solution. ' +
+        'Ids are ' + C.idPattern + '; append /solution-key to name one option. ' +
         'The manifest is the single source of truth and is validated by the test suite.'
 
       render()
